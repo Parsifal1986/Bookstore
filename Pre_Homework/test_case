@@ -1,0 +1,17 @@
+16
+insert DRIVE 2017
+insert DRIVE 2018
+insert DRIVE 2019
+insert DRIVE 2020
+find DRIVE
+delete DRIVE 2019
+find DRIVE
+insert FlowersForAlgernon 1966
+insert CppPrimer 2012
+insert Dune 2021
+insert CppPrimer 2001
+find CppPrimer
+find Java
+delete Dune 2021
+find Dune
+find DRIVE
