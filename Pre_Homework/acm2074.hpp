@@ -147,11 +147,15 @@ public:
           break;
         }
       }
+      file.seekg(position, std::ios::beg);
+      file.read(reinterpret_cast<char *>(cur), sizeofNode);
       if (i >= 1) {
         file.seekg(cur->next[i], std::ios::beg);
         Node *son = new Node;
         file.read(reinterpret_cast<char *>(son), sizeofNode);
         cur->key[i - 1] = son->key[0];
+        file.seekp(position, std::ios::beg);
+        file.write(reinterpret_cast<char *>(cur), sizeofNode);
         delete son;
       }
       if (cur->size < 2 && cur->parent != -1) {
@@ -163,7 +167,7 @@ public:
   };
 
   void Find(T &value) {
-    Node *root = new Node;
+    Node *root = new Node;//后续可能要考虑delete root的问题
     file.seekg(root_position, std::ios::beg);
     file.read(reinterpret_cast<char *>(root), sizeofNode);
     if (root->size == 0) {
@@ -255,14 +259,15 @@ public:
       }
       delete brother;
     } else {
+      int brother_pos = parent->next[i - 1];
       Node *brother = new Node;
-      file.seekg(parent->next[i - 1], std::ios::beg);
+      file.seekg(brother_pos, std::ios::beg);
       file.read(reinterpret_cast<char *>(brother), sizeofNode);
       brother->key[brother->size] = cur->key[i - 1];
       brother->size++;
       if (parent->size > 1) {
-        for (int j = i - 1; j < parent->size - 1; ++j) {
-          parent->key[j] = parent->key[j + 1];
+        for (int j = i; j < parent->size; ++j) {
+          parent->key[j - 1] = parent->key[j];
           parent->next[j] = parent->next[j + 1];
         }
         parent->size--;
@@ -271,13 +276,14 @@ public:
         root_position = parent->next[0];
       }
       brother->next[brother->size] = cur->next[1];
-      file.seekg(parent->next[i - 1], std::ios::beg);
+      file.seekg(brother_pos, std::ios::beg);
       file.write(reinterpret_cast<char *>(brother), sizeofNode);
       if (brother->parent != -1) {
         file.seekp(brother->parent, std::ios::beg);
         file.write(reinterpret_cast<char *>(parent), sizeofNode);
       }
       if (brother->size == 4) {
+        file.seekp(brother_pos + sizeofNode, std::ios::beg);
         split(brother);
       }
       delete brother;
