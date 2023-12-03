@@ -1,4 +1,4 @@
-16
+32
 insert DRIVE 2017
 insert DRIVE 2018
 insert DRIVE 2019
@@ -13,5 +13,21 @@ insert CppPrimer 2001
 find CppPrimer
 find Java
 delete Dune 2021
+find Dune
+find DRIVE
+insert DRIVE 2019
+insert DRIVE 2014
+insert DRIVE 2015
+insert DRIVE 2013
+find DRIVE
+delete DRIVE 2014
+find DRIVE
+insert FlowersForAlgernon 1996
+insert CppPrimer 2092
+insert Dune 2071
+insert CppPrimer 2077
+find CppPrimer
+find Java
+delete Dune 2071
 find Dune
 find DRIVE

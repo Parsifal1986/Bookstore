@@ -186,21 +186,27 @@ public:
         }
       }
     }
-    for (int i = 0; i < cur->size; ++i) {
-      if (value.Equal(cur->key[i])) {
-        flag = 1;
-        while (value.Equal(cur->key[i]) && i < cur->size) {
-          std::cout << cur->key[i].value << " ";
-          i++;
-          if (i == cur->size && cur->next[i] != -1) {
-            file.seekg(cur->next[i], std::ios::beg);
-            file.read(reinterpret_cast<char *>(cur), sizeofNode);
-            i = 0;
-          }
-        }
-        std::cout << "\n";
-        break;
+    int i = 0;
+    while (cur->key[i] < value && i < cur->size) {
+      i++;
+      if (i == cur->size && cur->next[i] != -1) {
+        file.seekg(cur->next[i], std::ios::beg);
+        file.read(reinterpret_cast<char *>(cur), sizeofNode);
+        i = 0;
       }
+    }
+    if (value.Equal(cur->key[i])) {
+      flag = 1;
+      while (value.Equal(cur->key[i]) && i < cur->size) {
+        std::cout << cur->key[i].value << " ";
+        i++;
+        if (i == cur->size && cur->next[i] != -1) {
+          file.seekg(cur->next[i], std::ios::beg);
+          file.read(reinterpret_cast<char *>(cur), sizeofNode);
+          i = 0;
+        }
+      }
+      std::cout << "\n";
     }
     if (!flag) {
       std::cout << "null" << "\n";

@@ -1,34 +1,52 @@
 #include "acm2074.hpp"
 
 struct keys{
-  char index[64] = {0};
+  char index[64] = {'\0'};
   int value = 0;
 
   bool operator<(const keys &other) const {
-    for (int i = 0; i < 64; ++i) {
+    int i = 0;
+    while(this->index[i] != '\0' && other.index[i] != '\0') {
       if (this->index[i] != other.index[i]) {
         return this->index[i] < other.index[i];
       }
+      ++i;
+    }
+    if (this->index[i] == '\0' && other.index[i] != '\0') {
+      return true;
+    } else if (this->index[i] != '\0' && other.index[i] == '\0') {
+      return false;
     }
     return this->value < other.value;
   }
 
   bool operator==(const keys &other) const {
-    for (int i = 0; i < 64; ++i) {
+    int i = 0;
+    while (this->index[i] != '\0' && other.index[i] != '\0') {
       if (this->index[i] != other.index[i]) {
         return false;
       }
+      ++i;
     }
-    return this->value == other.value;
+    if (this->index[i] == other.index[i] && this->index[i] == '\0'){
+      return this->value == other.value;
+    } else {
+      return false;
+    }
   }
 
   bool Equal(const keys b) {
-    for (int i = 0; i < 64; ++i) {
+    int i = 0;
+    while (this->index[i] != '\0' && b.index[i] != '\0') {
       if (this->index[i] != b.index[i]) {
         return false;
       }
+      ++i;
     }
-    return true;
+    if (this->index[i] == b.index[i] && this->index[i] == '\0') {
+      return true;
+    }
+    return false;
   }
 
   // std::ostream &operator<<(std::ostream &out, const keys &other) {
@@ -40,6 +58,8 @@ struct keys{
 
 int main() {
   Bp_Tree<keys, sizeof(int) + 64> tree("BP_Tree");
+  std::ios::sync_with_stdio(false);
+  std::cin.tie(0);std::cout.tie(0);
   keys value;
   std::string command;
   int n;
