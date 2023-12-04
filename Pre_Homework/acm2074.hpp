@@ -102,6 +102,8 @@ public:
         file.read(reinterpret_cast<char *>(son), sizeofNode);
         cur->key[i - 1] = son->key[0];
         delete son;
+        file.seekp(position, std::ios::beg);
+        file.write(reinterpret_cast<char *>(cur), sizeofNode);
       }
     }
     delete cur;
@@ -263,7 +265,7 @@ public:
       Node *brother = new Node;
       file.seekg(brother_pos, std::ios::beg);
       file.read(reinterpret_cast<char *>(brother), sizeofNode);
-      brother->key[brother->size] = cur->key[i - 1];
+      brother->key[brother->size] = cur->key[0];
       brother->size++;
       if (parent->size > 1) {
         for (int j = i; j < parent->size; ++j) {
@@ -291,10 +293,25 @@ public:
     delete parent;
   };
 
+  void change_sons_parent(Node *cur) {
+    int cur_pos = int(file.tellp()) - sizeofNode;
+    for (int i = 0; i < cur->size + 1; ++i) {
+      file.seekg(cur->next[i], std::ios::beg);
+      Node *son = new Node;
+      file.read(reinterpret_cast<char *>(son), sizeofNode);
+      son->parent = cur_pos;
+      file.seekp(-sizeofNode, std::ios::cur);
+      file.write(reinterpret_cast<char *>(son), sizeofNode);
+      delete son;
+    }
+    return;
+  };
+
   void split(Node *cur) {
     Node *new_node = new Node;
     for (int i = 0; i < 2; ++i) {
       new_node->key[i] = cur->key[i + 2];
+      new_node->next[i] = cur->next[i + 2];
     }
     int cur_pos = int(file.tellp()) - sizeofNode;
     cur->size = 2;
@@ -306,6 +323,9 @@ public:
     int new_pos = (int)file.tellp();
     cur->next[2] = new_pos;
     file.write(reinterpret_cast<char *>(new_node), sizeofNode);
+    if (!cur->is_leaf) {
+      change_sons_parent(new_node);
+    }
     file.seekp(cur_pos, std::ios::beg);
     file.write(reinterpret_cast<char *>(cur), sizeofNode);
     if (cur->parent == -1) {
@@ -341,17 +361,17 @@ public:
           parent->size++;
           break;
         }
-        if (i == parent->size) {
-          parent->key[i] = new_node->key[0];
-          parent->size++;
-        }
+      }
+      if (i == parent->size) {
+        parent->key[i] = new_node->key[0];
+        parent->size++;
       }
       parent->next[i + 1] = new_pos;
+      file.seekg(cur->parent, std::ios::beg);
+      file.write(reinterpret_cast<char *>(parent), sizeofNode);
       if (parent->size == 4) {
         split(parent);
       }
-      file.seekg(cur->parent, std::ios::beg);
-      file.write(reinterpret_cast<char *>(parent), sizeofNode);
       delete parent;
     };
     delete new_node;
