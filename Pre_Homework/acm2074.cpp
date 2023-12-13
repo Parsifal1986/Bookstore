@@ -1,4 +1,4 @@
-#include "acm2074.hpp"
+#include "acm2074(another_method).hpp"
 
 struct keys{
   char index[64] = {'\0'};
@@ -49,7 +49,7 @@ struct keys{
     return false;
   }
 
-  // std::ostream &operator<<(std::ostream &out, const keys &other) {
+  // std::ostream& operator<<(std::ostream &out, const keys &other) {
   //   out << other.value;
   //   return out;
   // }
@@ -57,7 +57,7 @@ struct keys{
 };
 
 int main() {
-  Bp_Tree<keys, sizeof(int) + 64> tree("BP_Tree");
+  Linklist<keys> linklist;
   std::ios::sync_with_stdio(false);
   std::cin.tie(0);std::cout.tie(0);
   keys value;
@@ -68,13 +68,13 @@ int main() {
     std::cin >> command;
     if (command == "insert") {
       std::cin >> value.index >> value.value;
-      tree.Insert(value, tree.root_position);
+      linklist.Insert(value);
     } else if (command == "find") {
-      std::cin >> value.index;value.value = 0;
-      tree.Find(value);
+      std::cin >> value.index;value.value = -1;
+      linklist.Find(value);
     } else if (command == "delete") {
       std::cin >> value.index >> value.value;
-      tree.Delete(value, tree.root_position);
+      linklist.Delete(value);
     }
   }
   return 0;
