@@ -3,9 +3,11 @@
 
 #include "memoryriver.hpp"
 #include "blocklinkedlist.hpp"
+#include <fstream>
 #include <iostream>
 #include <cstdio>
 #include <map>
+#include <stdexcept>
 
 class Book {
  public:
@@ -25,7 +27,7 @@ class Book {
 
   bool check_enough(int quantity);
 
-  bool change_quantity(int quantity);
+  void change_quantity(int quantity);
 
  private:
     char isbn[21] = {'\0'};
@@ -38,7 +40,9 @@ class Book {
 
 class BookDatabase {
  public:
-  BookDatabase() = default;
+  BookDatabase() {
+    memoryriver.initialise("book_data");
+  };
 
   ~BookDatabase() = default;
 
@@ -71,7 +75,9 @@ class IndexSystem {
 
 class ISBNIndex : public IndexSystem {
  public:
-  ISBNIndex() = default;
+  ISBNIndex() {
+    Index.clear();
+  };
 
   ~ISBNIndex() = default;
 
@@ -87,9 +93,13 @@ class ISBNIndex : public IndexSystem {
 
 class NameIndex : public IndexSystem {
  public:
-  NameIndex() = default;
+  NameIndex() {
+    Index.set_filename("NameIndex");
+  };
 
-  ~NameIndex() = default;
+  ~NameIndex(){
+    
+  };
 
   std::vector<int> search_book(char *key) override;
 
@@ -120,7 +130,9 @@ class NameIndex : public IndexSystem {
 
 class AuthorIndex : public IndexSystem {
  public:
-  AuthorIndex() = default;
+  AuthorIndex() {
+    Index.set_filename("AuthorIndex");
+  };
 
   ~AuthorIndex() = default;
 
@@ -150,7 +162,9 @@ class AuthorIndex : public IndexSystem {
 
 class KeywordIndex : public IndexSystem {
  public:
-  KeywordIndex() = default;
+  KeywordIndex() {
+    Index.set_filename("KeywordIndex");
+  };
 
   ~KeywordIndex() = default;
 
