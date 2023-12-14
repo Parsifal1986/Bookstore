@@ -23,26 +23,32 @@ private:
 
   int head = 0, sizeofNode;
 
+  std::string file_name = "LinkList";
+
   std::fstream file;
 
 public:
   Linklist() {
-    file.open("Linklist.dat", std::ios::out | std::ios::in | std::ios::binary);
+    file.open(file_name, std::ios::out | std::ios::in | std::ios::binary);
     sizeofNode = sizeof(Node);
     if (!file) {
-      file.open("Linklist.dat", std::ios::out);
+      file.open(file_name, std::ios::out);
       head = 0;
       Node *head = new Node;
       head->size = 0;
       file.write(reinterpret_cast<char *>(head), sizeofNode);
       file.close();
-      file.open("Linklist.dat", std::ios::out | std::ios::in | std::ios::binary);
+      file.open(file_name, std::ios::out | std::ios::in | std::ios::binary);
       delete head;
     }
   }
 
   ~Linklist() {
     file.close();
+  }
+
+  void set_filename(std::string filename) {
+    file_name = filename;
   }
 
   void Insert(T value) {

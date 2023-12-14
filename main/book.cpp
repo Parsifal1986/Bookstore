@@ -1,4 +1,5 @@
 #include "book.hpp"
+#include "tokenscanner.hpp"
 #include <cstring>
 #include <vector>
 
@@ -56,6 +57,11 @@ bool Book::check_enough(int quantity) {
   return true;
 };
 
+void Book::change_quantity(int quantity) {
+  this->quantity += quantity;
+  return;
+};
+
 int BookDatabase::add_book(Book &book) {
   int book_number;
   memoryriver.get_info(book_number, 1);
@@ -81,7 +87,9 @@ void BookDatabase::update_book(int index, Book &book) {
 };
 
 Book BookDatabase::query_book(int index) {
-  return memoryriver.read(book, index);
+  Book book;
+  memoryriver.read(book, index);
+  return book;
 };
 
 void BookDatabase::list_book(std::vector<int> &index_list) {
@@ -214,18 +222,18 @@ void BookOperator::update_book() {
   std::string input;
   getline(std::cin, input);
   Tokenscanner scanner(input);
-  whlie (scanner.hasMoreTokens()) {
-    std::string token = scanner.nextToken();
+  while (scanner.has_more_tokens()) {
+    std::string token = scanner.next_token();
     if (token == "-ISBN") {
-      strcpy(isbn, scanner.nextToken().c_str());
+      strcpy(isbn, scanner.next_token().c_str());
     } else if (token == "-name") {
-      strcpy(name, scanner.nextToken().c_str());
+      strcpy(name, scanner.next_token().c_str());
     } else if (token == "-author") {
-      strcpy(author, scanner.nextToken().c_str());
+      strcpy(author, scanner.next_token().c_str());
     } else if (token == "-keyword") {
-      strcpy(keyword, scanner.nextToken().c_str());
+      strcpy(keyword, scanner.next_token().c_str());
     } else if (token == "-price") {
-      price = atof(scanner.nextToken().c_str());
+      price = atof(scanner.next_token().c_str());
     }
   }
   Book new_book(isbn, name, author, keyword, price, quantity);
