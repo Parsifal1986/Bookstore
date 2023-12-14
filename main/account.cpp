@@ -60,7 +60,10 @@ bool AccountManager::delete_account(std::string userid){
     return false;
   } else {
     User blank_user;
+    int user_number;
+    memoryriver.get_info(user_number, 1);
     memoryriver.Delete(account[userid]);
+    memoryriver.write_info(user_number - 1, 1);
     account.erase(userid);
     return true;
   }
