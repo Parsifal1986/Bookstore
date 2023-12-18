@@ -3,11 +3,15 @@
 
 #include "memoryriver.hpp"
 #include "blocklinkedlist.hpp"
+#include "tokenscanner.hpp"
 #include <fstream>
 #include <iostream>
 #include <cstdio>
 #include <map>
 #include <stdexcept>
+#include <utility>
+
+extern Tokenscanner tokenscanner;
 
 class Book {
  public:
@@ -17,7 +21,7 @@ class Book {
 
   ~Book() = default;
 
-  void create_book(char *isbn, char *name, char *author, char *keyword, double price, int quantity);
+  void create_book(char *isbn);
 
   void modify_book(Book &book);
 
@@ -39,9 +43,19 @@ class Book {
 };
 
 class BookDatabase {
+
  public:
   BookDatabase() {
     memoryriver.initialise("book_data");
+    Index.clear();
+    int book_number;
+    memoryriver.get_info(book_number, 1);
+    for (int i = 0; i < book_number; ++i) {
+      Book tmp;
+      memoryriver.read(tmp, i * sizeof(Book) + sizeof(int));
+      Index.insert(
+          std::make_pair(tmp.show_book_name(), i * sizeof(Book) + sizeof(int)));
+    }
   };
 
   ~BookDatabase() = default;
@@ -56,42 +70,18 @@ class BookDatabase {
 
   void list_book(std::vector<int> &index_list);
 
+  std::vector<int> search_book(char *key);
+
+  void add_index(char *key, int index);
+
+  void delete_index(char *key, int index);
+
  private:
   MemoryRiver<Book, 1> memoryriver;
-};
-
-class IndexSystem {
- public:
-  IndexSystem() = default;
-
-  virtual ~IndexSystem() = default;
-
-  virtual std::vector<int> search_book(char *key) = 0;
-
-  virtual void add_index(char *key, int index);
-
-  virtual void delete_index(char *key, int index);
-};
-
-class ISBNIndex : public IndexSystem {
- public:
-  ISBNIndex() {
-    Index.clear();
-  };
-
-  ~ISBNIndex() = default;
-
-  std::vector<int> search_book(char *key) override;
-
-  void add_index(char *key, int index) override;
-
-  void delete_index(char *key, int index) override;
-
- private:
   std::map<std::string, int> Index;
 };
 
-class NameIndex : public IndexSystem {
+class NameIndex {
  public:
   NameIndex() {
     Index.set_filename("NameIndex");
@@ -101,11 +91,11 @@ class NameIndex : public IndexSystem {
     
   };
 
-  std::vector<int> search_book(char *key) override;
+  std::vector<int> search_book(char *key);
 
-  void add_index(char *key, int index) override;
+  void add_index(char *key, int index);
 
-  void delete_index(char *key, int index) override;
+  void delete_index(char *key, int index);
 
  private:
   struct Node {
@@ -128,19 +118,21 @@ class NameIndex : public IndexSystem {
   Linklist<Node> Index;
 };
 
-class AuthorIndex : public IndexSystem {
+class AuthorIndex {
  public:
   AuthorIndex() {
     Index.set_filename("AuthorIndex");
   };
 
-  ~AuthorIndex() = default;
+  ~AuthorIndex() {
 
-  std::vector<int> search_book(char *key) override;
+  };
 
-  void add_index(char *key, int index) override;
+  std::vector<int> search_book(char *key);
 
-  void delete_index(char *key, int index) override;
+  void add_index(char *key, int index);
+
+  void delete_index(char *key, int index);
  private:
    struct Node {
     char author[61];
@@ -160,19 +152,21 @@ class AuthorIndex : public IndexSystem {
    Linklist<Node> Index;
 };
 
-class KeywordIndex : public IndexSystem {
+class KeywordIndex {
  public:
   KeywordIndex() {
     Index.set_filename("KeywordIndex");
   };
 
-  ~KeywordIndex() = default;
+  ~KeywordIndex() {
 
-  std::vector<int> search_book(char *key) override;
+  };
 
-  void add_index(char *key, int index) override;
+  std::vector<int> search_book(char *key);
 
-  void delete_index(char *key, int index) override;
+  void add_index(char *key, int index);
+
+  void delete_index(char *key, int index);
 
  private:
    struct Node {
@@ -199,7 +193,7 @@ class BookOperator {
 
   ~BookOperator() = default;
 
-  void search_book();
+  void show_book();
 
   void select_book();
 
@@ -211,7 +205,6 @@ class BookOperator {
 
  private:
   BookDatabase bookdatabase;
-  ISBNIndex isbnindex;
   NameIndex nameindex;
   AuthorIndex authorindex;
   KeywordIndex keywordindex;

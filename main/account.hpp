@@ -1,7 +1,10 @@
 #ifndef ACCOUNT_HPP
 #define ACCOUNT_HPP
 
+#include "book.hpp"
 #include "memoryriver.hpp"
+#include "tokenscanner.hpp"
+
 #include <iostream>
 #include <map>
 #include <cstdio>
@@ -9,6 +12,8 @@
 #include <cstring>
 #include <set>
 #include <string>
+
+extern Tokenscanner tokenscanner;
 
 class User {
   public:
@@ -22,12 +27,20 @@ class User {
 
   void create_user(char *userid, char *password, char right, char *username);
 
-  bool login(char *password);
+  bool check_password(char *password);
 
   bool check_right(int needed_right);
 
-  char* check_name() {
-    return username;
+  void change_password(char *password) {
+    std::strcpy(this->password, password);
+  }
+
+  char read_right() {
+    return right;
+  }
+
+  char* check_id() {
+    return userid;
   };
 
   private:
@@ -40,7 +53,7 @@ class User {
 class AccountManager {
  public: 
 
-  AccountManager() = default;
+  AccountManager();
 
   ~AccountManager() = default;
 
@@ -50,10 +63,12 @@ class AccountManager {
 
   bool update_account(User &user);
 
-  bool query_account(std::string userid);
+  int query_account(std::string userid);
+
+  User draw_account(int index);
 
  private:
-  std::map<std::string, int> account;
+  std::map<std::string, int> account_base;
   MemoryRiver<User, 1> memoryriver;
 };
 
@@ -76,6 +91,9 @@ class AccountOperator {
   void logout();
 
   bool check_right(int needed_right) {
+    if (userlist.empty()) {
+      return false;
+    }
     return userlist.top().check_right(needed_right);
   }
 
