@@ -1,6 +1,8 @@
 #include "account.hpp"
+#include "book.hpp"
 #include "memoryriver.hpp"
 #include "tokenscanner.hpp"
+#include <cctype>
 #include <cstring>
 
 User::User(char *userid, char *password, char right, char *username) {
@@ -98,12 +100,24 @@ void AccountOperator::register_user() {
   char userid[31];
   char password[31];
   char username[31];
+  if (!tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
   tokenscanner.set_char(userid);
   if (account.query_account(userid) != -1) {
     throw 1;
   }
+  if (!tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
   tokenscanner.set_char(password);
+  if (!tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
   tokenscanner.set_char(username);
+  if (tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
   User user;
   user.register_user(userid, password, username);
   account.add_account(user);
@@ -115,6 +129,9 @@ void AccountOperator::add_user() {
   char password[31];
   char username[31];
   char right;
+  if (!tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
   tokenscanner.set_char(userid);
   if (userlist.empty()) {
     throw 1;
@@ -125,10 +142,22 @@ void AccountOperator::add_user() {
   if (account.query_account(userid) != -1) {
     throw 1;
   }
+  if (!tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
   tokenscanner.set_char(password);
   right = tokenscanner.next_token().c_str()[0];
+  if (!isdigit(right)) {
+    throw 1;
+  }
+  if (!tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
   tokenscanner.set_char(username);
   if (!check_right(right + 1) || (right != '1' && right != '3')) {
+    throw 1;
+  }
+  if (tokenscanner.has_more_tokens()) {
     throw 1;
   }
   User user(userid, password, right, username);
@@ -138,6 +167,9 @@ void AccountOperator::add_user() {
 
 void AccountOperator::delete_user() {
   char userid[31];
+  if (!tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
   tokenscanner.set_char(userid);
   if (!check_right('7')) {
     throw 1;
@@ -159,22 +191,30 @@ void AccountOperator::modify_user() {
   if (userlist.empty()) {
     throw 1;
   }
+  if (!tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
   tokenscanner.set_char(userid);
   if (account.query_account(userid) == -1) {
     throw 1;
   }
   User modified_user = account.draw_account(account.query_account(userid));
   if (!check_right('7')) {
-    tokenscanner.set_char(current_password);
-  } else {
-    if (tokenscanner.has_more_tokens()) {
-      tokenscanner.set_char(current_password);
+    if (!tokenscanner.has_more_tokens()) {
+      throw 1;
     }
+    tokenscanner.set_char(current_password);
   }
-  if (!modified_user.check_password(current_password)) {
+  if (!modified_user.check_password(current_password) && strlen(current_password)) {
+    throw 1;
+  }
+  if (!tokenscanner.has_more_tokens()) {
     throw 1;
   }
   tokenscanner.set_char(new_password);
+  if (tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
   modified_user.change_password(new_password);
   account.update_account(modified_user);
   return;
@@ -190,13 +230,16 @@ void AccountOperator::login() {
   User new_user = account.draw_account(account.query_account(userid));
   if (!check_right(new_user.read_right())) {
     tokenscanner.set_char(password);
+    if (!new_user.check_password(password)) {
+      throw 1;
+    }
   } else {
     if (tokenscanner.has_more_tokens()) {
       tokenscanner.set_char(password);
+      if (!new_user.check_password(password)) {
+        throw 1;
+      }
     }
-  }
-  if (!new_user.check_password(password)) {
-    throw 1;
   }
   if (check_log_or_not.find(userid) != check_log_or_not.end()) {
     throw 1;

@@ -10,10 +10,10 @@
 #include <regex>
 #include <string>
 
-const int SIZE = 180;
-
 template<class T> class Linklist {
 private:  
+
+  constexpr int SIZE = (4096 / (sizeof(T) + sizeof(int)));
 
   struct Node {
     T value[SIZE];

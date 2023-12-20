@@ -19,60 +19,52 @@ int main() {
       std::string line;
       std::getline(std::cin, line);
       tokenscanner.set_line(line);
+      if (!tokenscanner.has_more_tokens()) {
+        continue;
+      }
       command = tokenscanner.next_token();
       if (command == "su") {
         account_operator.login();
-      }
-      if (command == "logout") {
+      } else if (command == "logout") {
         account_operator.logout();
-      }
-      if (command == "register") {
+      } else if (command == "register") {
         account_operator.register_user();
-      }
-      if (command == "passwd") {
+      } else if (command == "passwd") {
         account_operator.modify_user();
-      }
-      if (command == "useradd") {
+      } else if (command == "useradd") {
         account_operator.add_user();
-      }
-      if (command == "delete") {
+      } else if (command == "delete") {
         account_operator.delete_user();
-      }
-      if (command == "show") {
+      } else if (command == "show") {
         if (!account_operator.check_right('1')) {
           throw 1;
         }
         book_operator.show_book();
-      }
-      if (command == "select") {
+      } else if (command == "select") {
         if (!account_operator.check_right('3')) {
           throw 1;
           continue;
         }
         book_operator.select_book();
-      }
-      if (command == "modify") {
+      } else if (command == "modify") {
         if (!account_operator.check_right('3')) {
           throw 1;
           continue;
         }
         book_operator.update_book();
-      }
-      if (command == "import") {
+      } else if (command == "import") {
         if (!account_operator.check_right('3')) {
           throw 1;
           continue;
         }
         book_operator.import_book();
-      }
-      if (command == "buy") {
+      } else if (command == "buy") {
         if (!account_operator.check_right('1')) {
           throw 1;
           continue;
         }
         book_operator.buy_book();
-      }
-      if (command == "show finance") {
+      } else if (command == "show finance") {
         if (!account_operator.check_right('7')) {
           throw 1;
           continue;
@@ -83,9 +75,10 @@ int main() {
           throw 1;
         }
         Log.show_finance(count);
-      }
-      if (command == "quit" || command == "exit") {
+      } else if (command == "quit" || command == "exit") {
         break;
+      } else {
+        throw 1;
       }
     } catch (int){
       std::cout << "Invalid" << std::endl;

@@ -31,6 +31,13 @@ class Tokenscanner {
         ++pos;
         break;
       }
+      if (devide_by_slash && line[pos] == '|') {
+        ++pos;
+        break;
+      }
+    }
+    if (devide_by_slash) {
+      return line.substr(start, pos - start - 1);
     }
     if (get_quotation_content) {
       return line.substr(start + 1, pos - start - 2);
@@ -131,12 +138,17 @@ class Tokenscanner {
     this->get_quotation_content = get_quotation_content;
   }
 
+  void set_devide_by_slash(bool devide_by_slash) {
+    this->devide_by_slash = devide_by_slash;
+  }
+
  private:
   std::string line;
   int pos = 0;
   std::vector<std::string> tokens;
   bool cut_up_equal_sign = false;
   bool get_quotation_content = false;
+  bool devide_by_slash = false;
 };
 
 #endif //TOKENSCANNER_HPP
