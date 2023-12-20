@@ -1,7 +1,13 @@
 #include "book.hpp"
 #include "tokenscanner.hpp"
+#include <algorithm>
 #include <cstring>
+#include <string>
 #include <vector>
+
+NameIndex nameindex;
+AuthorIndex authorindex;
+KeywordIndex keywordindex;
 
 Book::Book(char *isbn, char *name, char *author, char *keyword, double price, int quantity) {
   strcpy(this->isbn, isbn);
@@ -19,23 +25,28 @@ void Book::create_book(char *isbn) {
 
 void Book::modify_book(Book &new_book) {
   if (!strcmp(isbn, new_book.isbn)) {
-    std::cout << "Didn't change ISBN" << std::endl;
-    return;
-  }
-  if (strlen(new_book.isbn)) {
-    strcpy(this->isbn, new_book.isbn);
+    throw 1;
   }
   if (strlen(new_book.name)) {
+    nameindex.delete_index(this->name, this->isbn);
     strcpy(this->name, new_book.name);
+    nameindex.add_index(this->name, this->isbn);
   }
   if (strlen(new_book.author)) {
+    authorindex.delete_index(this->author, this->isbn);
     strcpy(this->author, new_book.author);
+    authorindex.add_index(this->author, this->isbn);
   }
   if (strlen(new_book.author)) {
+    keywordindex.delete_index(this->keyword, this->isbn);
     strcpy(this->keyword, new_book.keyword);
+    keywordindex.add_index(this->keyword, this->isbn);
   }
   if (new_book.price != -1) {
     this->price = new_book.price;
+  }
+  if (strlen(new_book.isbn)) {
+    strcpy(this->isbn, new_book.isbn);
   }
   return;
 };
@@ -57,10 +68,6 @@ void Book::change_quantity(int quantity) {
   return;
 };
 
-char *Book::show_book_name() {
-  return name;
-};
-
 int BookDatabase::add_book(Book &book) {
   int book_number;
   memoryriver.get_info(book_number, 1);
@@ -80,7 +87,15 @@ void BookDatabase::delete_book(int index) {
 void BookDatabase::update_book(int index, Book &book) {
   Book old_book;
   memoryriver.read(old_book, index);
-  old_book.modify_book(book);
+  if (strcmp(old_book.show_book_isbn(), book.show_book_isbn()) && strlen(book.show_book_isbn())) {
+    Index.erase(old_book.show_book_isbn());
+    Index.insert(std::make_pair(book.show_book_isbn(), index));
+  }
+    try {
+      old_book.modify_book(book);
+    } catch (int) {
+      throw 1;
+    }
   memoryriver.update(old_book, index);
   return;
 };
@@ -95,6 +110,15 @@ void BookDatabase::list_book(std::vector<int> &index_list) {
   Book book;
   for (auto it = index_list.begin(); it != index_list.end(); it++) {
     memoryriver.read(book, *it);
+    book.show_book();
+  }
+  return;
+};
+
+void BookDatabase::list_book(std::vector<std::string> &index_list) {
+  Book book;
+  for (auto it = index_list.begin(); it != index_list.end(); it++) {
+    memoryriver.read(book, Index[*it]);
     book.show_book();
   }
   return;
@@ -125,67 +149,67 @@ void BookDatabase::delete_index(char *key, int index) {
   return;
 }
 
-void NameIndex::add_index(char *key, int index) {
+void NameIndex::add_index(char *key, char* isbn){
   Node tmp;
-  tmp.index = index;
   strcpy(tmp.name, key);
+  strcpy(tmp.isbn, isbn);
   Index.Insert(tmp);
   return;
 }
 
-void NameIndex::delete_index(char *key, int index) {
+void NameIndex::delete_index(char *key, char *isbn) {
   Node tmp;
-  tmp.index = index;
   strcpy(tmp.name, key);
+  strcpy(tmp.isbn, isbn);
   Index.Delete(tmp);
   return;
 }
 
-std::vector<int> NameIndex::search_book(char *key) {
+std::vector<std::string> NameIndex::search_book(char *key) {
   Node tmp;
   strcpy(tmp.name, key);
   return Index.Find(tmp);
 }
 
-void AuthorIndex::add_index(char *key, int index) {
+void AuthorIndex::add_index(char *key, char *isbn) {
   Node tmp;
-  tmp.index = index;
   strcpy(tmp.author, key);
+  strcpy(tmp.isbn, isbn);
   Index.Insert(tmp);
   return;
 }
 
-void AuthorIndex::delete_index(char *key, int index) {
+void AuthorIndex::delete_index(char *key, char *isbn) {
   Node tmp;
-  tmp.index = index;
   strcpy(tmp.author, key);
+  strcpy(tmp.isbn, isbn);
   Index.Delete(tmp);
   return;
 }
 
-std::vector<int> AuthorIndex::search_book(char *key) {
+std::vector<std::string> AuthorIndex::search_book(char *key) {
   Node tmp;
   strcpy(tmp.author, key);
   return Index.Find(tmp);
 }
 
-void KeywordIndex::add_index(char *key, int index) {
+void KeywordIndex::add_index(char *key, char *isbn) {
   Node tmp;
-  tmp.index = index;
   strcpy(tmp.keyword, key);
+  strcpy(tmp.isbn, isbn);
   Index.Insert(tmp);
   return;
 }
 
-void KeywordIndex::delete_index(char *key, int index) {
+void KeywordIndex::delete_index(char *key, char *isbn) {
   Node tmp;
-  tmp.index = index;
   strcpy(tmp.keyword, key);
+  strcpy(tmp.isbn, isbn);
   Index.Delete(tmp);
   return;
 }
 
-std::vector<int> KeywordIndex::search_book(char *key) {
+std::vector<std::string> KeywordIndex::search_book(char *key) {
   Node tmp;
   strcpy(tmp.keyword, key);
   return Index.Find(tmp);
@@ -195,51 +219,51 @@ void BookOperator::show_book() {
   tokenscanner.set_whether_cut_up_equal_sign(true);
   std::string token = tokenscanner.next_token();
   tokenscanner.set_whether_cut_up_equal_sign(false);
-  std::vector <int> index_list;
   if (token == "-ISBN=") {
+    std::vector <int> index_list;
     char ISBN[21];
     tokenscanner.set_char(ISBN);
     index_list = bookdatabase.search_book(ISBN);
     if (index_list.empty()) {
-      std::cout << "No such book" << std::endl;
-      return;
+      throw 1;
     }
+    if (tokenscanner.has_more_tokens()) {
+      throw 1;
+    }
+    bookdatabase.list_book(index_list);
   } else {
+    std::vector<std::string> index_list;
     tokenscanner.set_get_quotation_content(true);
     if (token == "-name=") {
       char name[61];
       tokenscanner.set_char(name);
       index_list = nameindex.search_book(name);
       if (index_list.empty()) {
-        std::cout << "No such book" << std::endl;
-        return;
+        throw 1;
       }
     } else if (token == "-author=") {
       char author[61];
       tokenscanner.set_char(author);
       index_list = authorindex.search_book(author);
       if (index_list.empty()) {
-        std::cout << "No such book" << std::endl;
-        return;
+        throw 1;
       }
     } else if (token == "-keyword=") {
       char keyword[61];
       tokenscanner.set_char(keyword);
       index_list = keywordindex.search_book(keyword);
       if (index_list.empty()) {
-        std::cout << "No such book" << std::endl;
-        return;
+        throw 1;
       }
     } else {
-      std::cout << "Invalid command" << std::endl;
-      return;
+      throw 1;
     }
     tokenscanner.set_get_quotation_content(false);
+    if (tokenscanner.has_more_tokens()) {
+      throw 1;
+    }
+    bookdatabase.list_book(index_list);
   }
-  if (tokenscanner.has_more_tokens()) {
-    std::cout << "Invalid command" << std::endl;
-  }
-  bookdatabase.list_book(index_list);
   return;
 }
 
@@ -259,8 +283,7 @@ void BookOperator::select_book() {
 
 void BookOperator::update_book() {
   if (selected_book == -1) {
-    std::cout << "No book is selected" << std::endl;
-    return;
+    throw 1;
   }
   char isbn[21] = {'\0'};
   char name[61] = {'\0'};
@@ -289,7 +312,11 @@ void BookOperator::update_book() {
     }
   }
   Book new_book(isbn, name, author, keyword, price, quantity);
-  bookdatabase.update_book(selected_book, new_book);
+  try {
+    bookdatabase.update_book(selected_book, new_book);
+  } catch (int){
+    throw 1;
+  }
   return;
 }
 
@@ -298,18 +325,15 @@ void BookOperator::buy_book() {
   int quantity;
   std::cin >> isbn >> quantity;
   if (bookdatabase.search_book(isbn).empty()) {
-    std::cout << "No such book" << std::endl;
-    return;
+    throw 1;
   } else {
     Book book;
     book = bookdatabase.query_book(bookdatabase.search_book(isbn)[0]);
     if (book.check_enough(quantity)) {
-      std::cout << "Book is not enough" << std::endl;
-      return;
+      throw 1;
     } else {
       book.change_quantity(-quantity);
       bookdatabase.update_book(bookdatabase.search_book(isbn)[0], book);
-      std::cout << "Success" << std::endl;
       return;
     }
   }
@@ -321,14 +345,12 @@ void BookOperator::import_book() {
     double cost;
     std::cin >> isbn >> quantity >> cost;
     if (bookdatabase.search_book(isbn).empty()) {
-        std::cout << "No such book" << std::endl;
-        return;
+      throw 1;
     } else {
         Book book;
         book = bookdatabase.query_book(bookdatabase.search_book(isbn)[0]);
         book.change_quantity(quantity);
         bookdatabase.update_book(bookdatabase.search_book(isbn)[0], book);
-        std::cout << "Success" << std::endl;
         return;
     }
 }

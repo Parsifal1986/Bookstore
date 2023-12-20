@@ -23,12 +23,19 @@ private:
 
   int head = 0, sizeofNode;
 
-  std::string file_name = "LinkList";
+  std::string file_name;
 
   std::fstream file;
 
 public:
-  Linklist() {
+  Linklist() = default;
+
+  ~Linklist() {
+    file.close();
+  }
+
+  void initialise(std::string filename) {
+    file_name = filename;
     file.open(file_name, std::ios::out | std::ios::in | std::ios::binary);
     sizeofNode = sizeof(Node);
     if (!file) {
@@ -41,10 +48,6 @@ public:
       file.open(file_name, std::ios::out | std::ios::in | std::ios::binary);
       delete head;
     }
-  }
-
-  ~Linklist() {
-    file.close();
   }
 
   void set_filename(std::string filename) {
@@ -147,8 +150,8 @@ public:
     return;
   }
 
-  std::vector<int> Find(T value) {
-    std::vector<int> result;
+  std::vector<std::string> Find(T value) {
+    std::vector<std::string> result;
     Node *p = new Node;
     file.seekg(head);
     file.read(reinterpret_cast<char *>(p), sizeofNode);
@@ -159,7 +162,7 @@ public:
     for (int i = 0; i < p->size; ++i) {
       if (p->value[i].Equal(value)) {
         while(p->value[i].Equal(value)) {
-          result.push_back(p->value[i].index);
+          result.push_back(p->value[i].isbn);
           ++i;
           if (i == p->size) {
             if (p->next_pos != -1) {
