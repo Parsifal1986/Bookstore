@@ -39,6 +39,22 @@ class Tokenscanner {
     }
   }
 
+  int next_number() {
+    if (pos >= line.length())
+      return 0;
+    while (line[pos] == ' ')
+      ++pos;
+    int start = pos;
+    while (pos < line.length() && line[pos] != ' ' && isdigit(line[pos])) {
+      ++pos;
+      if (cut_up_equal_sign && line[pos] == '=') {
+        ++pos;
+        break;
+      }
+    }
+    return std::stoi(line.substr(start, pos - start));
+  }
+
   bool has_more_tokens() {
     if (pos >= line.length())
       return false;

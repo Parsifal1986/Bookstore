@@ -6,6 +6,7 @@
 #include <cstdio>
 
 Tokenscanner tokenscanner;
+LogManager Log;
 
 int main() {
   AccountOperator account_operator;
@@ -70,6 +71,18 @@ int main() {
           continue;
         }
         book_operator.buy_book();
+      }
+      if (command == "show finance") {
+        if (!account_operator.check_right('7')) {
+          throw 1;
+          continue;
+        }
+        int count;
+        count = tokenscanner.next_number();
+        if (tokenscanner.has_more_tokens()) {
+          throw 1;
+        }
+        Log.show_finance(count);
       }
       if (command == "quit" || command == "exit") {
         break;

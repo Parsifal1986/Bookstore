@@ -4,7 +4,7 @@
 #include "book.hpp"
 #include "memoryriver.hpp"
 #include "tokenscanner.hpp"
-
+#include "log.hpp"
 #include <iostream>
 #include <map>
 #include <cstdio>

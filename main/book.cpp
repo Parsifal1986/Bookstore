@@ -298,7 +298,11 @@ void BookOperator::update_book() {
     if (token == "-ISBN=") {
       strcpy(isbn, tokenscanner.next_token().c_str());
     } else if (token == "-price=") {
-      price = atof(tokenscanner.next_token().c_str());
+      char *pend;
+      price = strtof(tokenscanner.next_token().c_str(), &pend);
+      if (strlen(pend)) {
+        throw 1;
+      }
     } else {
       tokenscanner.set_get_quotation_content(true);
       if (token == "-name=") {
@@ -323,7 +327,11 @@ void BookOperator::update_book() {
 void BookOperator::buy_book() {
   char isbn[21];
   int quantity;
-  std::cin >> isbn >> quantity;
+  tokenscanner.set_char(isbn);
+  quantity = tokenscanner.next_number();
+  if (tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
   if (bookdatabase.search_book(isbn).empty()) {
     throw 1;
   } else {
@@ -334,16 +342,22 @@ void BookOperator::buy_book() {
     } else {
       book.change_quantity(-quantity);
       bookdatabase.update_book(bookdatabase.search_book(isbn)[0], book);
+      Log.update_finance(book.show_book_price() * quantity, false);
       return;
     }
   }
 }
 
 void BookOperator::import_book() {
-    char isbn[21];
+    char isbn[21], *pend;
     int quantity;
     double cost;
-    std::cin >> isbn >> quantity >> cost;
+    tokenscanner.set_char(isbn);
+    quantity = tokenscanner.next_number();
+    cost = std::strtof(tokenscanner.next_token().c_str(), &pend);
+    if (strlen(pend)) {
+      throw 1;
+    }
     if (bookdatabase.search_book(isbn).empty()) {
       throw 1;
     } else {
@@ -351,6 +365,7 @@ void BookOperator::import_book() {
         book = bookdatabase.query_book(bookdatabase.search_book(isbn)[0]);
         book.change_quantity(quantity);
         bookdatabase.update_book(bookdatabase.search_book(isbn)[0], book);
+        Log.update_finance(cost, true);
         return;
     }
 }

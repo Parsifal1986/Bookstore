@@ -3,6 +3,7 @@
 
 #include "blocklinkedlist.hpp"
 #include "memoryriver.hpp"
+#include "log.hpp"
 #include "tokenscanner.hpp"
 #include <cstdio>
 #include <cstring>
@@ -14,6 +15,7 @@
 #include <utility>
 
 extern Tokenscanner tokenscanner;
+extern LogManager Log;
 
 class Book {
 public:
@@ -33,6 +35,8 @@ public:
   char *show_book_name() { return name; };
 
   char *show_book_isbn() { return isbn; };
+  
+  float show_book_price() { return price; };
 
   bool check_enough(int quantity);
 
