@@ -57,11 +57,11 @@ class AccountManager {
 
   ~AccountManager() = default;
 
-  bool add_account(User &user);
+  void add_account(User &user);
 
-  bool delete_account(std::string userid);
+  void delete_account(std::string userid);
 
-  bool update_account(User &user);
+  void update_account(User &user);
 
   int query_account(std::string userid);
 

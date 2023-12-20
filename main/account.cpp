@@ -51,26 +51,19 @@ AccountManager::AccountManager() {
   }
 }
 
-bool AccountManager::add_account(User &user){
-  if (query_account(user.check_id()) != -1) {
-    std::cout << "user already exists" << std::endl;
-    return false;
-  } else {
-    int user_number;
-    memoryriver.get_info(user_number,1);
-    account_base.insert(std::pair<std::string, int>(user.check_id(), memoryriver.write(user)));
-    memoryriver.write_info(user_number + 1, 1);
-    return true;
-  }
+void AccountManager::add_account(User &user){
+  int user_number;
+  memoryriver.get_info(user_number,1);
+  account_base.insert(std::pair<std::string, int>(user.check_id(), memoryriver.write(user)));
+  memoryriver.write_info(user_number + 1, 1);
 }
 
-bool AccountManager::delete_account(std::string userid){
+void AccountManager::delete_account(std::string userid){
   int user_number;
   memoryriver.get_info(user_number, 1);
   memoryriver.Delete(account_base[userid]);
   memoryriver.write_info(user_number - 1, 1);
   account_base.erase(userid);
-  return true;
 }
 
 int AccountManager::query_account(std::string userid){
@@ -81,9 +74,8 @@ int AccountManager::query_account(std::string userid){
   }
 }
 
-bool AccountManager::update_account(User &user){
+void AccountManager::update_account(User &user){
   memoryriver.update(user, account_base[user.check_id()]);
-  return true;
 }
 
 User AccountManager::draw_account(int index){
@@ -108,8 +100,7 @@ void AccountOperator::register_user() {
   char username[31];
   tokenscanner.set_char(userid);
   if (account.query_account(userid) != -1) {
-    std::cout << "user already exists" << std::endl;
-    return;
+    throw 1;
   }
   tokenscanner.set_char(password);
   tokenscanner.set_char(username);
@@ -126,23 +117,19 @@ void AccountOperator::add_user() {
   char right;
   tokenscanner.set_char(userid);
   if (userlist.empty()) {
-    std::cout << "No account has log in" << std::endl;
-    return;
+    throw 1;
   }
   if (!check_right('3')) {
-    std::cout << "Permission denied" << std::endl;
-    return;
+    throw 1;
   }
   if (account.query_account(userid) != -1) {
-    std::cout << "user already exists" << std::endl;
-    return;
+    throw 1;
   }
   tokenscanner.set_char(password);
   right = tokenscanner.next_token().c_str()[0];
   tokenscanner.set_char(username);
   if (!check_right(right + 1) || (right != '1' && right != '3')) {
-    std::cout << "Permission denied" << std::endl;
-    return;
+    throw 1;
   }
   User user(userid, password, right, username);
   account.add_account(user);
@@ -153,16 +140,13 @@ void AccountOperator::delete_user() {
   char userid[31];
   tokenscanner.set_char(userid);
   if (!check_right('7')) {
-    std::cout << "Permission denied" << std::endl;
-    return;
+    throw 1;
   }
   if (account.query_account(userid) == -1) {
-    std::cout << "Invalid ID" << std::endl;
-    return;
+    throw 1;
   }
   if (check_log_or_not.find(userid) != check_log_or_not.end()) {
-    std::cout << "Account has log in and can't be deleted right now" << std::endl;
-    return;
+    throw 1;
   }
   account.delete_account(userid);
   return;
@@ -173,13 +157,11 @@ void AccountOperator::modify_user() {
   char current_password[31];
   char new_password[31];
   if (userlist.empty()) {
-    std::cout << "No account has log in" << std::endl;
-    return;
+    throw 1;
   }
   tokenscanner.set_char(userid);
   if (account.query_account(userid) == -1) {
-    std::cout << "Invalid ID" << std::endl;
-    return;
+    throw 1;
   }
   User modified_user = account.draw_account(account.query_account(userid));
   if (!check_right('7')) {
@@ -190,8 +172,7 @@ void AccountOperator::modify_user() {
     }
   }
   if (!modified_user.check_password(current_password)) {
-    std::cout << "Invalid password" << std::endl;
-    return;
+    throw 1;
   }
   tokenscanner.set_char(new_password);
   modified_user.change_password(new_password);
@@ -204,8 +185,7 @@ void AccountOperator::login() {
   char password[31];
   tokenscanner.set_char(userid);
   if (account.query_account(userid) == -1) {
-    std::cout << "Invalid ID" << std::endl;
-    return;
+    throw 1;
   }
   User new_user = account.draw_account(account.query_account(userid));
   if (!check_right(new_user.read_right())) {
@@ -216,23 +196,19 @@ void AccountOperator::login() {
     }
   }
   if (!new_user.check_password(password)) {
-    std::cout << "Invalid password" << std::endl;
-    return;
+    throw 1;
   }
   if (check_log_or_not.find(userid) != check_log_or_not.end()) {
-    std::cout << "Account has log in" << std::endl;
-    return;
+    throw 1;
   }
   userlist.push(new_user);
   check_log_or_not.insert(userid);
-  std::cout << "welcome" << new_user.check_id() << std::endl;
   return;
 }
 
 void AccountOperator::logout() {
   if (userlist.empty()) {
-    std::cout << "No account has log in" << std::endl;
-    return;
+    throw 1;
   } else {
     check_log_or_not.erase(userlist.top().check_id());
     userlist.pop();
