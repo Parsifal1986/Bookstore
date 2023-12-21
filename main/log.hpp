@@ -7,7 +7,9 @@
 
 class LogManager {
  public:
-  LogManager() = default;
+  LogManager() {
+    finance.initialise("finance");
+  };
 
   ~LogManager() = default;
 
@@ -20,7 +22,7 @@ class LogManager {
   void show_finance(int count);
 
  private:
-  MemoryRiver<std::pair<int, int>, 1> finance;
+  MemoryRiver<std::pair<float, float>, 1> finance;
 };
 
 

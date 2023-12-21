@@ -13,7 +13,7 @@
 template<class T> class Linklist {
 private:  
 
-  constexpr int SIZE = (4096 / (sizeof(T) + sizeof(int)));
+  static constexpr int SIZE = ((4096 - sizeof(int) * 3) / sizeof(T)) * 10;
 
   struct Node {
     T value[SIZE];

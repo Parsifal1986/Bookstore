@@ -2,6 +2,7 @@
 #include "tokenscanner.hpp"
 #include <algorithm>
 #include <cstring>
+#include <iomanip>
 #include <string>
 #include <vector>
 
@@ -14,6 +15,11 @@ Book::Book(char *isbn, char *name, char *author, char *keyword, double price, in
   strcpy(this->name, name);
   strcpy(this->author, author);
   strcpy(this->keyword, keyword);
+  this->price = price;
+  this->quantity = quantity;
+};
+
+Book::Book(double price, int quantity) {
   this->price = price;
   this->quantity = quantity;
 };
@@ -37,13 +43,16 @@ void Book::modify_book(Book &new_book) {
     strcpy(this->author, new_book.author);
     authorindex.add_index(this->author, strlen(new_book.isbn) ? new_book.isbn : this->isbn);
   }
-  if (strlen(new_book.author)) {
+  if (strlen(new_book.keyword)) {
     keywordindex.delete_index(this->keyword, this->isbn);
     strcpy(this->keyword, new_book.keyword);
     keywordindex.add_index(this->keyword, strlen(new_book.isbn) ? new_book.isbn : this->isbn);
   }
   if (new_book.price != -1) {
     this->price = new_book.price;
+  }
+  if (new_book.quantity != -1) {
+    this->quantity = new_book.quantity;
   }
   if (strlen(new_book.isbn)) {
     strcpy(this->isbn, new_book.isbn);
@@ -52,7 +61,7 @@ void Book::modify_book(Book &new_book) {
 };
 
 void Book::show_book() {
-  std::cout << isbn << "\t" << name << "\t" << author << "\t" << keyword << "\t" << price << "\t" << quantity << std::endl;
+  std::cout << isbn << "\t" << name << "\t" << author << "\t" << keyword << "\t" << setiosflags(std::ios::fixed) << std::setprecision(2) << price << "\t" << quantity << std::endl;
   return;
 };
 
@@ -105,6 +114,17 @@ Book BookDatabase::query_book(int index) {
   memoryriver.read(book, index);
   return book;
 };
+
+void BookDatabase::list_book() {
+  Book book;
+  int book_number;
+  memoryriver.get_info(book_number, 1);
+  for (auto it  = Index.begin(); it != Index.end(); it++) {
+    memoryriver.read(book, it->second);
+    book.show_book();
+  }
+  return;
+}
 
 void BookDatabase::list_book(std::vector<int> &index_list) {
   Book book;
@@ -224,21 +244,19 @@ void KeywordIndex::delete_index(char *key, char *isbn) {
 std::vector<std::string> KeywordIndex::search_book(char *key) {
   Tokenscanner division;
   division.set_line(key);
-  division.set_devide_by_slash(true);
   std::vector<std::string> result;
   result.clear();
-  while (division.has_more_tokens()) {
-    Node tmp;
-    strcpy(tmp.keyword, division.next_token().c_str());
-    std::vector<std::string> tmp_result = Index.Find(tmp);
-    result.insert(result.end(), tmp_result.begin(), tmp_result.end());
-  }
+  Node tmp;
+  strcpy(tmp.keyword, division.next_token().c_str());
+  std::vector<std::string> tmp_result = Index.Find(tmp);
+  result.insert(result.end(), tmp_result.begin(), tmp_result.end());
   return result;
 }
 
 void BookOperator::show_book() {
   if (!tokenscanner.has_more_tokens()) {
-    throw 1;
+    bookdatabase.list_book();
+    return;
   }
   tokenscanner.set_whether_cut_up_equal_sign(true);
   std::string token = tokenscanner.next_token();
@@ -252,7 +270,8 @@ void BookOperator::show_book() {
     tokenscanner.set_char(ISBN);
     index_list = bookdatabase.search_book(ISBN);
     if (index_list.empty()) {
-      throw 1;
+      std::cout << std::endl;
+      return;
     }
     if (tokenscanner.has_more_tokens()) {
       throw 1;
@@ -269,21 +288,27 @@ void BookOperator::show_book() {
       tokenscanner.set_char(name);
       index_list = nameindex.search_book(name);
       if (index_list.empty()) {
-        throw 1;
+        std::cout << std::endl;
+        tokenscanner.set_get_quotation_content(false);
+        return;
       }
     } else if (token == "-author=") {
       char author[61];
       tokenscanner.set_char(author);
       index_list = authorindex.search_book(author);
       if (index_list.empty()) {
-        throw 1;
+        std::cout << std::endl;
+        tokenscanner.set_get_quotation_content(false);
+        return;
       }
     } else if (token == "-keyword=") {
       char keyword[61];
       tokenscanner.set_char(keyword);
       index_list = keywordindex.search_book(keyword);
       if (index_list.empty()) {
-        throw 1;
+        std::cout << std::endl;
+        tokenscanner.set_get_quotation_content(false);
+        return;
       }
     } else {
       throw 1;
@@ -333,6 +358,9 @@ void BookOperator::update_book() {
     tokenscanner.set_whether_cut_up_equal_sign(false);
     if (token == "-ISBN=") {
       strcpy(isbn, tokenscanner.next_token().c_str());
+      if (!bookdatabase.search_book(isbn).empty()) {
+        throw 1;
+      }
     } else if (token == "-price=") {
       char *pend;
       price = strtof(tokenscanner.next_token().c_str(), &pend);
@@ -370,7 +398,14 @@ void BookOperator::buy_book() {
     throw 1;
   }
   tokenscanner.set_char(isbn);
-  quantity = tokenscanner.next_number();
+  try {
+    quantity = tokenscanner.next_number();
+  } catch (int) {
+    throw 1;
+  }
+  if (quantity <= 0) {
+    throw 1;
+  }
   if (tokenscanner.has_more_tokens()) {
     throw 1;
   }
@@ -379,47 +414,45 @@ void BookOperator::buy_book() {
   } else {
     Book book;
     book = bookdatabase.query_book(bookdatabase.search_book(isbn)[0]);
-    if (book.check_enough(quantity)) {
+    if (!book.check_enough(quantity)) {
       throw 1;
     } else {
       book.change_quantity(-quantity);
-      bookdatabase.update_book(bookdatabase.search_book(isbn)[0], book);
+      Book new_book(-1, book.show_quantity());
+      bookdatabase.update_book(bookdatabase.search_book(isbn)[0], new_book);
       Log.update_finance(book.show_book_price() * quantity, false);
+      std::cout << setiosflags(std::ios::fixed) << std::setprecision(2) << book.show_book_price() * quantity << std::endl;
       return;
     }
   }
 }
 
 void BookOperator::import_book() {
-    char isbn[21], *pend;
-    int quantity;
-    double cost;
-    if (!tokenscanner.has_more_tokens()) {
-      throw 1;
-    }
-    tokenscanner.set_char(isbn);
-    if (!tokenscanner.has_more_tokens()) {
-      throw 1;
-    }
-    quantity = tokenscanner.next_number();
-    if (!tokenscanner.has_more_tokens()) {
-      throw 1;
-    }
-    cost = std::strtof(tokenscanner.next_token().c_str(), &pend);
-    if (strlen(pend)) {
-      throw 1;
-    }
-    if (tokenscanner.has_more_tokens()) {
-      throw 1;
-    }
-    if (bookdatabase.search_book(isbn).empty()) {
-      throw 1;
-    } else {
-      Book book;
-      book = bookdatabase.query_book(bookdatabase.search_book(isbn)[0]);
-      book.change_quantity(quantity);
-      bookdatabase.update_book(bookdatabase.search_book(isbn)[0], book);
-      Log.update_finance(cost, true);
-      return;
+  char *pend;
+  int quantity;
+  double cost;
+  if (selected_book == -1) {
+    throw 1;
   }
+  if (!tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
+  if (!tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
+  quantity = tokenscanner.next_number();
+  if (!tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
+  cost = std::strtof(tokenscanner.next_token().c_str(), &pend);
+  if (strlen(pend)) {
+    throw 1;
+  }
+  if (tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
+  Book book(-1, quantity + bookdatabase.query_book(selected_book).show_quantity());
+  bookdatabase.update_book(selected_book, book);
+  Log.update_finance(cost, true);
+  return;
 }

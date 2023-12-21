@@ -24,6 +24,8 @@ public:
   Book(char *isbn, char *name, char *author, char *keyword, double price,
        int quantity);
 
+  Book(double price, int quantity);
+
   ~Book() = default;
 
   void create_book(char *isbn);
@@ -37,6 +39,8 @@ public:
   char *show_book_isbn() { return isbn; };
   
   float show_book_price() { return price; };
+
+  int show_quantity() { return quantity; };
 
   bool check_enough(int quantity);
 
@@ -63,7 +67,7 @@ public:
       Book tmp;
       memoryriver.read(tmp, i * sizeof(Book) + sizeof(int));
       Index.insert(
-          std::make_pair(tmp.show_book_name(), i * sizeof(Book) + sizeof(int)));
+          std::make_pair(tmp.show_book_isbn(), i * sizeof(Book) + sizeof(int)));
     }
   };
 
@@ -80,6 +84,8 @@ public:
   void list_book(std::vector<int> &index_list);
 
   void list_book(std::vector<std::string> &index_list);
+
+  void list_book();
 
   std::vector<int> search_book(char *key);
 

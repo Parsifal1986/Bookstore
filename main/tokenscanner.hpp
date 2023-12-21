@@ -20,6 +20,7 @@ class Tokenscanner {
   }
 
   std::string next_token() {
+    pre_pos = pos;
     if (pos >= line.length())
       return "";
     while (line[pos] == ' ')
@@ -37,7 +38,11 @@ class Tokenscanner {
       }
     }
     if (devide_by_slash) {
-      return line.substr(start, pos - start - 1);
+      if (pos == line.length()){
+        return line.substr(start, pos - start);
+      } else {
+        return line.substr(start, pos - start - 1);
+      }
     }
     if (get_quotation_content) {
       return line.substr(start + 1, pos - start - 2);
@@ -68,6 +73,10 @@ class Tokenscanner {
     while (line[pos] == ' ')
       ++pos;
     return pos < line.length();
+  }
+
+  void scroll_back() {
+    pos = pre_pos;
   }
 
   void set_ignore_whitespace(bool ignore_whitespace) {
@@ -144,7 +153,7 @@ class Tokenscanner {
 
  private:
   std::string line;
-  int pos = 0;
+  int pos = 0, pre_pos = 0;
   std::vector<std::string> tokens;
   bool cut_up_equal_sign = false;
   bool get_quotation_content = false;

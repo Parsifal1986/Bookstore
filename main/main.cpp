@@ -14,7 +14,7 @@ int main() {
   std::string command;
 
   command.clear();
-  while (command != "quit" && command != "exit") {
+  while (command != "quit" && command != "exit" && !std::cin.eof()) {
     try {
       std::string line;
       std::getline(std::cin, line);
@@ -36,10 +36,26 @@ int main() {
       } else if (command == "delete") {
         account_operator.delete_user();
       } else if (command == "show") {
-        if (!account_operator.check_right('1')) {
-          throw 1;
+        if (tokenscanner.next_token() == "finance") {
+          if (!account_operator.check_right('7')) {
+            throw 1;
+            continue;
+          }
+          int count = -1;
+          if (tokenscanner.has_more_tokens()) {
+            count = tokenscanner.next_number();
+          }
+          if (tokenscanner.has_more_tokens()) {
+            throw 1;
+          }
+          Log.show_finance(count);
+        } else {
+          tokenscanner.scroll_back();
+          if (!account_operator.check_right('1')) {
+            throw 1;
+          }
+          book_operator.show_book();
         }
-        book_operator.show_book();
       } else if (command == "select") {
         if (!account_operator.check_right('3')) {
           throw 1;
@@ -64,17 +80,6 @@ int main() {
           continue;
         }
         book_operator.buy_book();
-      } else if (command == "show finance") {
-        if (!account_operator.check_right('7')) {
-          throw 1;
-          continue;
-        }
-        int count;
-        count = tokenscanner.next_number();
-        if (tokenscanner.has_more_tokens()) {
-          throw 1;
-        }
-        Log.show_finance(count);
       } else if (command == "quit" || command == "exit") {
         break;
       } else {
@@ -82,6 +87,9 @@ int main() {
       }
     } catch (int){
       std::cout << "Invalid" << std::endl;
+      tokenscanner.set_devide_by_slash(false);
+      tokenscanner.set_get_quotation_content(false);
+      tokenscanner.set_whether_cut_up_equal_sign(false);
     }
   }
   return 0;

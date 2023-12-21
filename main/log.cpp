@@ -1,4 +1,5 @@
 #include "log.hpp"
+#include <iomanip>
 
 // void LogManager::add_log(char *log) {
 //   this->log.push_back(log);
@@ -15,9 +16,9 @@
 void LogManager::update_finance(float deal, bool type) {
   int finance_number;
   finance.get_info(finance_number, 1);
-  std::pair<int, int> tmp;
-  finance.read(tmp, finance_number * sizeof(std::pair<int, int>) + sizeof(int));
-  if (type) {
+  std::pair<float, float> tmp;
+  finance.read(tmp, (finance_number - 1) * sizeof(std::pair<float, float>) + sizeof(int));
+  if (!type) {
     tmp.first += deal;
   } else {
     tmp.second += deal;
@@ -30,6 +31,9 @@ void LogManager::update_finance(float deal, bool type) {
 void LogManager::show_finance(int count) {
   int finance_number;
   finance.get_info(finance_number, 1);
+  if (count == -1) {
+    count = finance_number;
+  }
   if (count > finance_number) {
     std::cout << "Invalid" << std::endl;
     return;
@@ -38,9 +42,10 @@ void LogManager::show_finance(int count) {
     std::cout << std::endl;
     return;
   }
-  std::pair<int, int> tmp1, tmp2;
-  finance.read(tmp1, finance_number * sizeof(std::pair<int, int>) + sizeof(int));
-  finance.read(tmp2, (finance_number - count) * sizeof(std::pair<int, int>) + sizeof(int));
-  std::cout << "+" << tmp2.first - tmp1.first << " -" << tmp2.second - tmp1.second << std::endl;
+  std::pair<float, float> tmp1, tmp2;
+  finance.read(tmp1, (finance_number - 1) * sizeof(std::pair<float, float>) + sizeof(int));
+  finance.read(tmp2, (finance_number - count - 1) * sizeof(std::pair<float, float>) + sizeof(int));
+  std::cout << "+ " << setiosflags(std::ios::fixed) << std::setprecision(2) << tmp1.first - tmp2.first
+            << " - " << setiosflags(std::ios::fixed) << std::setprecision(2) << tmp1.second - tmp2.second << std::endl;
   return;
 }
