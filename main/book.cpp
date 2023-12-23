@@ -315,6 +315,9 @@ void BookOperator::show_book() {
     } else if (token == "-keyword=") {
       char keyword[61];
       strcpy(keyword, tokenscanner.next_quoted_token().c_str());
+      if (tokenscanner.check_specific_char(keyword, '|')) {
+        throw 1;
+      }
       index_list = keywordindex.search_book(keyword);
       if (index_list.empty()) {
         std::cout << std::endl;
@@ -469,6 +472,9 @@ void BookOperator::import_book() {
   }
   cost = std::strtod(tokenscanner.next_token().c_str(), &pend);
   if (strlen(pend)) {
+    throw 1;
+  }
+  if (cost <= 0) {
     throw 1;
   }
   if (tokenscanner.has_more_tokens()) {

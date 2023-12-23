@@ -185,6 +185,15 @@ class Tokenscanner {
     return false;
   }
 
+  bool check_specific_char(std::string str, char ch) {
+    for (int i = 0; i < str.length(); ++i) {
+      if (str[i] == ch) {
+        return true;
+      }
+    }
+    return false;
+  }
+
  private:
   std::string line;
   int pos = 0, pre_pos = 0;
