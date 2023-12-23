@@ -13,11 +13,11 @@
 //   return;
 // }
 
-void LogManager::update_finance(float deal, bool type) {
+void LogManager::update_finance(double deal, bool type) {
   int finance_number;
   finance.get_info(finance_number, 1);
-  std::pair<float, float> tmp;
-  finance.read(tmp, (finance_number - 1) * sizeof(std::pair<float, float>) + sizeof(int));
+  std::pair<double, double> tmp;
+  finance.read(tmp, (finance_number - 1) * sizeof(std::pair<double, double>) + sizeof(int));
   if (!type) {
     tmp.first += deal;
   } else {
@@ -42,9 +42,9 @@ void LogManager::show_finance(int count) {
     std::cout << std::endl;
     return;
   }
-  std::pair<float, float> tmp1, tmp2;
-  finance.read(tmp1, (finance_number - 1) * sizeof(std::pair<float, float>) + sizeof(int));
-  finance.read(tmp2, (finance_number - count - 1) * sizeof(std::pair<float, float>) + sizeof(int));
+  std::pair<double, double> tmp1, tmp2;
+  finance.read(tmp1, (finance_number - 1) * sizeof(std::pair<double, double>) + sizeof(int));
+  finance.read(tmp2, (finance_number - count - 1) * sizeof(std::pair<double, double>) + sizeof(int));
   std::cout << "+ " << setiosflags(std::ios::fixed) << std::setprecision(2) << tmp1.first - tmp2.first
             << " - " << setiosflags(std::ios::fixed) << std::setprecision(2) << tmp1.second - tmp2.second << std::endl;
   return;

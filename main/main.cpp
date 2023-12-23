@@ -7,9 +7,9 @@
 
 Tokenscanner tokenscanner;
 LogManager Log;
+AccountOperator account_operator;
 
 int main() {
-  AccountOperator account_operator;
   BookOperator book_operator;
   std::string command;
 
@@ -25,8 +25,10 @@ int main() {
       command = tokenscanner.next_token();
       if (command == "su") {
         account_operator.login();
+        book_operator.change_select();
       } else if (command == "logout") {
         account_operator.logout();
+        book_operator.change_select();
       } else if (command == "register") {
         account_operator.register_user();
       } else if (command == "passwd") {

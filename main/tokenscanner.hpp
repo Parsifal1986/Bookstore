@@ -1,6 +1,7 @@
 #ifndef TOKENSCANNER_HPP
 #define TOKENSCANNER_HPP
 
+#include <cctype>
 #include <iostream>
 #include <cstring>
 #include <vector>
@@ -57,6 +58,9 @@ class Tokenscanner {
     while (line[pos] == ' ')
       ++pos;
     int start = pos;
+    if (!std::isdigit(line[pos])) {
+      throw 1;
+    }
     while (pos < line.length() && line[pos] != ' ' && isdigit(line[pos])) {
       ++pos;
       if (cut_up_equal_sign && line[pos] == '=') {

@@ -44,27 +44,37 @@ bool User::check_right(int needed_right) {
 
 AccountManager::AccountManager() {
   memoryriver.initialise("AccountManager");
-  int user_number;
+  int user_number, left_to_be_deleted;
   memoryriver.get_info(user_number, 1);
-  for (int i = 0; i < user_number; ++i) {
+  memoryriver.get_info(left_to_be_deleted, 2);
+  for (int i = 0; i < user_number + left_to_be_deleted; ++i) {
     User tmp;
-    memoryriver.read(tmp, i * sizeof(User) + sizeof(int));
-    account_base.insert(std::pair<std::string, int>(tmp.check_id(), i * sizeof(User) + sizeof(int)));
+    memoryriver.read(tmp, i * sizeof(User) + 2 * sizeof(int));
+    if (!strlen(tmp.check_id())) {
+      continue;
+    }
+    account_base.insert(std::pair<std::string, int>(tmp.check_id(), i * sizeof(User) + 2 * sizeof(int)));
   }
 }
 
 void AccountManager::add_account(User &user){
-  int user_number;
+  int user_number, left_to_be_deleted;
   memoryriver.get_info(user_number,1);
+  memoryriver.get_info(left_to_be_deleted, 2);
   account_base.insert(std::pair<std::string, int>(user.check_id(), memoryriver.write(user)));
   memoryriver.write_info(user_number + 1, 1);
+  if (left_to_be_deleted) {
+    memoryriver.write_info(left_to_be_deleted - 1, 2);
+  }
 }
 
 void AccountManager::delete_account(std::string userid){
-  int user_number;
+  int user_number, left_to_be_deleted;
   memoryriver.get_info(user_number, 1);
+  memoryriver.get_info(left_to_be_deleted, 2);
   memoryriver.Delete(account_base[userid]);
   memoryriver.write_info(user_number - 1, 1);
+  memoryriver.write_info(left_to_be_deleted + 1, 2);
   account_base.erase(userid);
 }
 
@@ -241,10 +251,11 @@ void AccountOperator::login() {
       }
     }
   }
-  if (check_log_or_not.find(userid) != check_log_or_not.end()) {
-    throw 1;
-  }
+  // if (check_log_or_not.find(userid) != check_log_or_not.end()) {
+  //   throw 1;
+  // }
   userlist.push(new_user);
+  select_book.push(-1);
   check_log_or_not.insert(userid);
   return;
 }
@@ -255,6 +266,7 @@ void AccountOperator::logout() {
   } else {
     check_log_or_not.erase(userlist.top().check_id());
     userlist.pop();
+    select_book.pop();
   }
   return;
 }

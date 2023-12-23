@@ -1,6 +1,7 @@
 #ifndef BOOK_HPP
 #define BOOK_HPP
 
+#include "account.hpp"
 #include "blocklinkedlist.hpp"
 #include "memoryriver.hpp"
 #include "log.hpp"
@@ -14,6 +15,7 @@
 #include <string>
 #include <utility>
 
+extern AccountOperator account_operator;
 extern Tokenscanner tokenscanner;
 extern LogManager Log;
 
@@ -38,7 +40,7 @@ public:
 
   char *show_book_isbn() { return isbn; };
   
-  float show_book_price() { return price; };
+  double show_book_price() { return price; };
 
   int show_quantity() { return quantity; };
 
@@ -52,7 +54,7 @@ private:
   char author[61] = {'\0'};
   char keyword[61] = {'\0'};
   int quantity = 0;
-  float price = 0;
+  double price = 0;
 };
 
 class BookDatabase {
@@ -112,7 +114,7 @@ public:
 
 private:
   struct Node {
-    char name[61], isbn[21];
+    char name[61] = {'\0'}, isbn[21] = {'\0'};
 
     bool operator<(const Node &rhs) const {
       return strcmp(name, rhs.name) == 0 ? strcmp(isbn, rhs.isbn) < 0
@@ -142,7 +144,7 @@ public:
 
 private:
   struct Node {
-    char author[61], isbn[21];
+    char author[61] = {'\0'}, isbn[21] = {'\0'};
 
     bool operator<(const Node &rhs) const {
       return strcmp(author, rhs.author) == 0 ? strcmp(isbn, rhs.isbn) < 0
@@ -174,7 +176,7 @@ public:
 
 private:
   struct Node {
-    char keyword[61], isbn[21];
+    char keyword[61] = {'\0'}, isbn[21] = {'\0'};
 
     bool operator<(const Node &rhs) const {
       return strcmp(keyword, rhs.keyword) == 0
@@ -210,6 +212,11 @@ public:
   void import_book();
 
   void buy_book();
+
+  void change_select() {
+    selected_book = account_operator.check_select();
+    return;
+  };
 
 private:
   BookDatabase bookdatabase;

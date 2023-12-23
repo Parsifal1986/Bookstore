@@ -17,12 +17,12 @@ class LogManager {
 
   void show_log();
 
-  void update_finance(float deal, bool type);
+  void update_finance(double deal, bool type);
 
   void show_finance(int count);
 
  private:
-  MemoryRiver<std::pair<float, float>, 1> finance;
+  MemoryRiver<std::pair<double, double>, 1> finance;
 };
 
 

@@ -1,7 +1,6 @@
 #ifndef ACCOUNT_HPP
 #define ACCOUNT_HPP
 
-#include "book.hpp"
 #include "memoryriver.hpp"
 #include "tokenscanner.hpp"
 #include "log.hpp"
@@ -69,7 +68,7 @@ class AccountManager {
 
  private:
   std::map<std::string, int> account_base;
-  MemoryRiver<User, 1> memoryriver;
+  MemoryRiver<User, 2> memoryriver;
 };
 
 class AccountOperator {
@@ -97,9 +96,21 @@ class AccountOperator {
     return userlist.top().check_right(needed_right);
   }
 
+  void change_select(int book_number) {
+    select_book.top() = book_number;
+  }
+
+  int check_select() {
+    if (select_book.empty()) {
+      return -1;
+    }
+    return select_book.top();
+  }
+
  private:
   AccountManager account;
   std::stack<User> userlist;
+  std::stack<int> select_book;
   std::set<std::string> check_log_or_not;
 };
 
