@@ -171,7 +171,10 @@ void AccountOperator::add_user() {
   if (!tokenscanner.is_legal(password)) {
     throw 1;
   }
-  right = tokenscanner.next_number();
+  right = tokenscanner.next_token()[0];;
+  if (!std::isdigit(right)) {
+    throw 1;
+  }
   if (!tokenscanner.has_more_tokens()) {
     throw 1;
   }
