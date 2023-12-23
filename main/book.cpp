@@ -1,6 +1,7 @@
 #include "book.hpp"
 #include "tokenscanner.hpp"
 #include <algorithm>
+#include <bits/types/struct_tm.h>
 #include <cstring>
 #include <iomanip>
 #include <string>
@@ -44,6 +45,18 @@ void Book::modify_book(Book &new_book) {
     authorindex.add_index(this->author, strlen(new_book.isbn) ? new_book.isbn : this->isbn);
   }
   if (strlen(new_book.keyword)) {
+    Tokenscanner division;
+    division.set_line(new_book.keyword);
+    division.set_devide_by_slash(true);
+    std::set<std::string> tmp_set;
+    while (division.has_more_tokens()) {
+      std::string tmp = division.next_token();
+      if (tmp_set.find(tmp) != tmp_set.end()) {
+        throw 1;
+      }
+      tmp_set.insert(tmp);
+    }
+    division.set_devide_by_slash(false);
     keywordindex.delete_index(this->keyword, this->isbn);
     strcpy(this->keyword, new_book.keyword);
     keywordindex.add_index(this->keyword, strlen(new_book.isbn) ? new_book.isbn : this->isbn);
@@ -339,6 +352,7 @@ void BookOperator::select_book() {
   } else {
     selected_book = bookdatabase.search_book(ISBN)[0];
   }
+  account_operator.change_select(bookdatabase.search_book(ISBN)[0]);
   return;
 }
 
@@ -351,7 +365,7 @@ void BookOperator::update_book() {
   char author[61] = {'\0'};
   char keyword[61] = {'\0'};
   int quantity = -1;
-  float price = -1;
+  double price = -1;
   while (tokenscanner.has_more_tokens()) {
     tokenscanner.set_whether_cut_up_equal_sign(true);
     std::string token = tokenscanner.next_token();
@@ -363,7 +377,7 @@ void BookOperator::update_book() {
       }
     } else if (token == "-price=") {
       char *pend;
-      price = strtof(tokenscanner.next_token().c_str(), &pend);
+      price = strtod(tokenscanner.next_token().c_str(), &pend);
       if (strlen(pend)) {
         throw 1;
       }
@@ -437,14 +451,15 @@ void BookOperator::import_book() {
   if (!tokenscanner.has_more_tokens()) {
     throw 1;
   }
+  try {
+    quantity = tokenscanner.next_number();
+  } catch (int) {
+    throw 1;
+  }
   if (!tokenscanner.has_more_tokens()) {
     throw 1;
   }
-  quantity = tokenscanner.next_number();
-  if (!tokenscanner.has_more_tokens()) {
-    throw 1;
-  }
-  cost = std::strtof(tokenscanner.next_token().c_str(), &pend);
+  cost = std::strtod(tokenscanner.next_token().c_str(), &pend);
   if (strlen(pend)) {
     throw 1;
   }

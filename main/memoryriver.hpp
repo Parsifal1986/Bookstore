@@ -13,15 +13,26 @@ using std::string;
 template <class T, int info_len = 2> class MemoryRiver {
 private:
   /* your code here */
-  fstream file;
-  string file_name;
+  fstream file, info_file;
+  string file_name, info_file_name;
   int sizeofT = sizeof(T);
   std::vector<int> deleted_index;
 
 public:
   MemoryRiver() = default;
 
-  ~MemoryRiver() = default;
+  ~MemoryRiver() {
+    if (!deleted_index.empty()) {
+      info_file.open(info_file_name, std::ios::in | std::ios::out);
+      info_file.seekp(0, std::ios::beg);
+      int tmp = deleted_index.size();
+      info_file.write(reinterpret_cast<char *>(&tmp), sizeof(int));
+      for (int i = 0; i < deleted_index.size(); ++i) {
+        info_file.write(reinterpret_cast<char *>(&deleted_index[i]), sizeof(int));
+      }
+      deleted_index.clear();
+    }
+  };
 
   MemoryRiver(const string &file_name) : file_name(file_name) {}
 
@@ -36,6 +47,27 @@ public:
         file.write(reinterpret_cast<char *>(&tmp), sizeof(int));
     }
     file.close();
+    info_file_name = file_name + "temp_storage";
+    info_file.open(info_file_name, std::ios::in | std::ios::out);
+    if (info_file) {
+      int tmp;
+      info_file.seekg(0, std::ios::beg);
+      info_file.read(reinterpret_cast<char *>(&tmp), sizeof(int));
+      for (int i = 0; i < tmp; ++i) {
+        int tmp2;
+        info_file.read(reinterpret_cast<char *>(&tmp2), sizeof(int));
+        deleted_index.push_back(tmp2);
+      }
+      info_file.seekp(0, std::ios::beg);
+      tmp = 0;
+      info_file.write(reinterpret_cast<char *>(&tmp), sizeof(int));
+      info_file.close();
+    } else {
+      info_file.open(info_file_name, std::ios::out);
+      int tmp = 0;
+      info_file.write(reinterpret_cast<char *>(&tmp), sizeof(int));
+      info_file.close();
+    }
   }
 
   // 读出第n个int的值赋给tmp，1_base
@@ -101,6 +133,11 @@ public:
   // 删除位置索引index对应的对象(不涉及空间回收时，可忽略此函数)，保证调用的index都是由write函数产生
   void Delete(int index) { 
     deleted_index.push_back(index);
+    file.open(file_name, std::ios::in | std::ios::out);
+    file.seekp(index, std::ios::beg);
+    T tmp;
+    file.write(reinterpret_cast<char *>(&tmp), sizeofT);
+    file.close();
     return;
   }
 };
