@@ -114,6 +114,9 @@ void AccountOperator::register_user() {
     throw 1;
   }
   tokenscanner.set_char(userid);
+  if (!tokenscanner.is_legal(userid)) {
+    throw 1;
+  }
   if (account.query_account(userid) != -1) {
     throw 1;
   }
@@ -121,11 +124,17 @@ void AccountOperator::register_user() {
     throw 1;
   }
   tokenscanner.set_char(password);
+  if (!tokenscanner.is_legal(password)) {
+    throw 1;
+  }
   if (!tokenscanner.has_more_tokens()) {
     throw 1;
   }
   tokenscanner.set_char(username);
   if (tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
+  if (!tokenscanner.is_printable(username)) {
     throw 1;
   }
   User user;
@@ -143,6 +152,9 @@ void AccountOperator::add_user() {
     throw 1;
   }
   tokenscanner.set_char(userid);
+  if (!tokenscanner.is_legal(userid)) {
+    throw 1;
+  }
   if (userlist.empty()) {
     throw 1;
   }
@@ -156,14 +168,17 @@ void AccountOperator::add_user() {
     throw 1;
   }
   tokenscanner.set_char(password);
-  right = tokenscanner.next_token().c_str()[0];
-  if (!isdigit(right)) {
+  if (!tokenscanner.is_legal(password)) {
     throw 1;
   }
+  right = tokenscanner.next_number();
   if (!tokenscanner.has_more_tokens()) {
     throw 1;
   }
   tokenscanner.set_char(username);
+  if (tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
   if (!check_right(right + 1) || (right != '1' && right != '3')) {
     throw 1;
   }
@@ -181,6 +196,9 @@ void AccountOperator::delete_user() {
     throw 1;
   }
   tokenscanner.set_char(userid);
+  if (tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
   if (!check_right('7')) {
     throw 1;
   }

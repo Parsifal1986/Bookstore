@@ -155,6 +155,33 @@ class Tokenscanner {
     this->devide_by_slash = devide_by_slash;
   }
 
+  bool is_legal(std::string str) {
+    for (int i = 0; i < str.length(); ++i) {
+      if (!std::isalpha(str[i]) && !std::isdigit(str[i]) && str[i] != '_') {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool is_printable(std::string str) {
+    for (int i = 0; i < str.length(); ++i) {
+      if (!std::isprint(str[i])) {
+        return false;;
+      }
+    }
+    return true;
+  }
+
+  bool has_quotatioin_mark(std::string str) {
+    for (int i = 0; i < str.length(); ++i) {
+      if (str[i] == '"') {
+        return true;
+      }
+    }
+    return false;
+  }
+
  private:
   std::string line;
   int pos = 0, pre_pos = 0;
