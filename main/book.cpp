@@ -1,4 +1,5 @@
 #include "book.hpp"
+#include "account.hpp"
 #include "tokenscanner.hpp"
 #include <algorithm>
 #include <bits/types/struct_tm.h>
@@ -346,6 +347,9 @@ void BookOperator::select_book() {
   }
   if (bookdatabase.search_book(ISBN).empty()) {
     Book new_book;
+    if (!tokenscanner.is_printable(ISBN)) {
+      throw 1;
+    }
     new_book.create_book(ISBN);
     bookdatabase.add_index(ISBN, bookdatabase.add_book(new_book));
     selected_book = bookdatabase.search_book(ISBN)[0];
@@ -385,10 +389,21 @@ void BookOperator::update_book() {
       tokenscanner.set_get_quotation_content(true);
       if (token == "-name=") {
         strcpy(name, tokenscanner.next_token().c_str());
+        if (tokenscanner.has_quotatioin_mark(name)) {
+          throw 1;
+        }
       } else if (token == "-author=") {
         strcpy(author, tokenscanner.next_token().c_str());
+        if (tokenscanner.has_quotatioin_mark(author)) {
+          throw 1;
+        }
       } else if (token == "-keyword=") {
         strcpy(keyword, tokenscanner.next_token().c_str());
+        if (tokenscanner.has_quotatioin_mark(keyword)) {
+          throw 1;
+        }
+      } else {
+        throw 1;
       }
       tokenscanner.set_get_quotation_content(false);
     }
