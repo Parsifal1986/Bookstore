@@ -90,7 +90,6 @@ int main() {
     } catch (int){
       std::cout << "Invalid" << std::endl;
       tokenscanner.set_devide_by_slash(false);
-      tokenscanner.set_get_quotation_content(false);
       tokenscanner.set_whether_cut_up_equal_sign(false);
     }
   }

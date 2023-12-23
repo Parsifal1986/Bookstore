@@ -293,41 +293,36 @@ void BookOperator::show_book() {
     bookdatabase.list_book(index_list);
   } else {
     std::vector<std::string> index_list;
-    tokenscanner.set_get_quotation_content(true);
     if (!tokenscanner.has_more_tokens()) {
       throw 1;
     }
     if (token == "-name=") {
       char name[61];
-      tokenscanner.set_char(name);
+      strcpy(name, tokenscanner.next_quoted_token().c_str());
       index_list = nameindex.search_book(name);
       if (index_list.empty()) {
         std::cout << std::endl;
-        tokenscanner.set_get_quotation_content(false);
         return;
       }
     } else if (token == "-author=") {
       char author[61];
-      tokenscanner.set_char(author);
+      strcpy(author, tokenscanner.next_quoted_token().c_str());
       index_list = authorindex.search_book(author);
       if (index_list.empty()) {
         std::cout << std::endl;
-        tokenscanner.set_get_quotation_content(false);
         return;
       }
     } else if (token == "-keyword=") {
       char keyword[61];
-      tokenscanner.set_char(keyword);
+      strcpy(keyword, tokenscanner.next_quoted_token().c_str());
       index_list = keywordindex.search_book(keyword);
       if (index_list.empty()) {
         std::cout << std::endl;
-        tokenscanner.set_get_quotation_content(false);
         return;
       }
     } else {
       throw 1;
     }
-    tokenscanner.set_get_quotation_content(false);
     if (tokenscanner.has_more_tokens()) {
       throw 1;
     }
@@ -386,26 +381,24 @@ void BookOperator::update_book() {
         throw 1;
       }
     } else {
-      tokenscanner.set_get_quotation_content(true);
       if (token == "-name=") {
-        strcpy(name, tokenscanner.next_token().c_str());
+        strcpy(name, tokenscanner.next_quoted_token().c_str());
         if (tokenscanner.has_quotatioin_mark(name)) {
           throw 1;
         }
       } else if (token == "-author=") {
-        strcpy(author, tokenscanner.next_token().c_str());
+        strcpy(author, tokenscanner.next_quoted_token().c_str());
         if (tokenscanner.has_quotatioin_mark(author)) {
           throw 1;
         }
       } else if (token == "-keyword=") {
-        strcpy(keyword, tokenscanner.next_token().c_str());
+        strcpy(keyword, tokenscanner.next_quoted_token().c_str());
         if (tokenscanner.has_quotatioin_mark(keyword)) {
           throw 1;
         }
       } else {
         throw 1;
       }
-      tokenscanner.set_get_quotation_content(false);
     }
   }
   if (tokenscanner.has_more_tokens()) {

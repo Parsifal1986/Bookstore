@@ -45,11 +45,7 @@ class Tokenscanner {
         return line.substr(start, pos - start - 1);
       }
     }
-    if (get_quotation_content) {
-      return line.substr(start + 1, pos - start - 2);
-    } else {
-      return line.substr(start, pos - start);
-    }
+    return line.substr(start, pos - start);
   }
 
   int next_number() {
@@ -69,6 +65,17 @@ class Tokenscanner {
       }
     }
     return std::stoi(line.substr(start, pos - start));
+  }
+
+  std::string next_quoted_token() {
+    std::string tmp = next_token();
+    if (tmp[0] != '"' || tmp[tmp.length() - 1] != '"') {
+      throw 1;
+    }
+    if (tmp.length() <= 2 ) {
+      throw 1;
+    }
+    return tmp.substr(1, tmp.length() - 2);
   }
 
   bool has_more_tokens() {
@@ -147,10 +154,6 @@ class Tokenscanner {
     this->cut_up_equal_sign = cut_up_equal_sign;
   }
 
-  void set_get_quotation_content(bool get_quotation_content) {
-    this->get_quotation_content = get_quotation_content;
-  }
-
   void set_devide_by_slash(bool devide_by_slash) {
     this->devide_by_slash = devide_by_slash;
   }
@@ -187,7 +190,6 @@ class Tokenscanner {
   int pos = 0, pre_pos = 0;
   std::vector<std::string> tokens;
   bool cut_up_equal_sign = false;
-  bool get_quotation_content = false;
   bool devide_by_slash = false;
 };
 
