@@ -4,6 +4,7 @@
 #include "tokenscanner.hpp"
 #include <cctype>
 #include <cstring>
+#include <variant>
 
 User::User(char *userid, char *password, char right, char *username) {
   std::strcpy(this->userid, userid);
@@ -242,24 +243,41 @@ void AccountOperator::modify_user() {
     throw 1;
   }
   User modified_user = account.draw_account(account.query_account(userid));
-  if (!check_right('7')) {
-    if (!tokenscanner.has_more_tokens()) {
-      throw 1;
-    }
-    tokenscanner.set_char(current_password);
-  }
-  if (!modified_user.check_password(current_password) && strlen(current_password)) {
-    throw 1;
-  }
   if (!tokenscanner.has_more_tokens()) {
     throw 1;
   }
-  tokenscanner.set_char(new_password);
-  if (tokenscanner.has_more_tokens()) {
-    throw 1;
+  tokenscanner.set_char(current_password);
+  if (!check_right('7')) {
+    if (!modified_user.check_password(current_password)) {
+      throw 1;
+    }
+    if (!tokenscanner.has_more_tokens()) {
+      throw 1;
+    }
+    tokenscanner.set_char(new_password);
+    if (tokenscanner.has_more_tokens()) {
+      throw 1;
+    }
+    modified_user.change_password(new_password);
+    account.update_account(modified_user);
+  } else {
+    if (tokenscanner.has_more_tokens()) {
+      tokenscanner.set_char(new_password);
+      std::swap(current_password, new_password);
+      if (tokenscanner.has_more_tokens()) {
+        throw 1;
+      }
+      if (!modified_user.check_password(current_password)) {
+        throw 1;
+      }
+      modified_user.change_password(new_password);
+      account.update_account(modified_user);
+    } else {
+      strcpy(new_password, current_password);
+      modified_user.change_password(new_password);
+      account.update_account(modified_user);
+    }
   }
-  modified_user.change_password(new_password);
-  account.update_account(modified_user);
   return;
 }
 

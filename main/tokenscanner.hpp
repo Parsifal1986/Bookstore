@@ -4,6 +4,7 @@
 #include <cctype>
 #include <iostream>
 #include <cstring>
+#include <stdexcept>
 #include <vector>
 
 class Tokenscanner {
@@ -70,7 +71,13 @@ class Tokenscanner {
     if (pos - start > 10) {
       throw 1;
     }
-    return std::stoi(line.substr(start, pos - start));
+    int result;
+    try {
+      result = std::stoi(line.substr(start, pos - start));
+    } catch (std::out_of_range) {
+      throw 1;
+    }
+    return result;
   }
 
   std::string next_quoted_token() {
