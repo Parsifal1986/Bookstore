@@ -13,6 +13,7 @@
 #include <string>
 
 extern Tokenscanner tokenscanner;
+extern LogManager Log;
 
 class User {
   public:
@@ -105,6 +106,10 @@ class AccountOperator {
       return -1;
     }
     return select_book.top();
+  }
+
+  std::string check_id() {
+    return userlist.top().check_id();
   }
 
  private:

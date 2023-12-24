@@ -38,6 +38,9 @@ class Tokenscanner {
         break;
       }
     }
+    if (word_limit != -1 && pos - start > word_limit) {
+      throw 1;
+    }
     if (devide_by_slash) {
       if (pos == line.length()){
         return line.substr(start, pos - start);
@@ -63,6 +66,9 @@ class Tokenscanner {
         ++pos;
         break;
       }
+    }
+    if (pos - start > 10) {
+      throw 1;
     }
     return std::stoi(line.substr(start, pos - start));
   }
@@ -158,6 +164,10 @@ class Tokenscanner {
     this->devide_by_slash = devide_by_slash;
   }
 
+  void set_word_limit(int word_limit) {
+    this->word_limit = word_limit;
+  }
+
   bool is_legal(std::string str) {
     for (int i = 0; i < str.length(); ++i) {
       if (!std::isalpha(str[i]) && !std::isdigit(str[i]) && str[i] != '_') {
@@ -200,6 +210,7 @@ class Tokenscanner {
   std::vector<std::string> tokens;
   bool cut_up_equal_sign = false;
   bool devide_by_slash = false;
+  int word_limit = -1;
 };
 
 #endif //TOKENSCANNER_HPP

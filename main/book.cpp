@@ -281,6 +281,7 @@ void BookOperator::show_book() {
     if (!tokenscanner.has_more_tokens()) {
       throw 1;
     }
+    tokenscanner.set_word_limit(20);
     tokenscanner.set_char(ISBN);
     index_list = bookdatabase.search_book(ISBN);
     if (index_list.empty()) {
@@ -296,6 +297,7 @@ void BookOperator::show_book() {
     if (!tokenscanner.has_more_tokens()) {
       throw 1;
     }
+    tokenscanner.set_word_limit(60);
     if (token == "-name=") {
       char name[61];
       strcpy(name, tokenscanner.next_quoted_token().c_str());
@@ -339,6 +341,7 @@ void BookOperator::select_book() {
   if (!tokenscanner.has_more_tokens()) {
     throw 1;
   }
+  tokenscanner.set_word_limit(20);
   tokenscanner.set_char(ISBN);
   if (tokenscanner.has_more_tokens()) {
     throw 1;
@@ -373,28 +376,33 @@ void BookOperator::update_book() {
     std::string token = tokenscanner.next_token();
     tokenscanner.set_whether_cut_up_equal_sign(false);
     if (token == "-ISBN=") {
+      tokenscanner.set_word_limit(20);
       strcpy(isbn, tokenscanner.next_token().c_str());
       if (!bookdatabase.search_book(isbn).empty()) {
         throw 1;
       }
     } else if (token == "-price=") {
       char *pend;
+      tokenscanner.set_word_limit(13);
       price = strtod(tokenscanner.next_token().c_str(), &pend);
       if (strlen(pend)) {
         throw 1;
       }
     } else {
       if (token == "-name=") {
+        tokenscanner.set_word_limit(60);
         strcpy(name, tokenscanner.next_quoted_token().c_str());
         if (tokenscanner.has_quotatioin_mark(name)) {
           throw 1;
         }
       } else if (token == "-author=") {
+        tokenscanner.set_word_limit(60);
         strcpy(author, tokenscanner.next_quoted_token().c_str());
         if (tokenscanner.has_quotatioin_mark(author)) {
           throw 1;
         }
       } else if (token == "-keyword=") {
+        tokenscanner.set_word_limit(60);
         strcpy(keyword, tokenscanner.next_quoted_token().c_str());
         if (tokenscanner.has_quotatioin_mark(keyword)) {
           throw 1;
@@ -422,6 +430,7 @@ void BookOperator::buy_book() {
   if (!tokenscanner.has_more_tokens()) {
     throw 1;
   }
+  tokenscanner.set_word_limit(20);
   tokenscanner.set_char(isbn);
   try {
     quantity = tokenscanner.next_number();
@@ -470,6 +479,7 @@ void BookOperator::import_book() {
   if (!tokenscanner.has_more_tokens()) {
     throw 1;
   }
+  tokenscanner.set_word_limit(13);
   cost = std::strtod(tokenscanner.next_token().c_str(), &pend);
   if (strlen(pend)) {
     throw 1;

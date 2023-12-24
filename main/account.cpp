@@ -103,6 +103,7 @@ AccountOperator::AccountOperator() {
     char username[] = "root";
     User user(userid, password, '7', username);
     account.add_account(user);
+    Log.add_admin("root");
   }
 }
 
@@ -113,6 +114,7 @@ void AccountOperator::register_user() {
   if (!tokenscanner.has_more_tokens()) {
     throw 1;
   }
+  tokenscanner.set_word_limit(30);
   tokenscanner.set_char(userid);
   if (!tokenscanner.is_legal(userid)) {
     throw 1;
@@ -151,6 +153,7 @@ void AccountOperator::add_user() {
   if (!tokenscanner.has_more_tokens()) {
     throw 1;
   }
+  tokenscanner.set_word_limit(30);
   tokenscanner.set_char(userid);
   if (!tokenscanner.is_legal(userid)) {
     throw 1;
@@ -171,7 +174,12 @@ void AccountOperator::add_user() {
   if (!tokenscanner.is_legal(password)) {
     throw 1;
   }
-  right = tokenscanner.next_token()[0];;
+  std::string tmp(tokenscanner.next_token());
+  if (tmp.size() > 1) {
+    throw 1;
+  } else {
+    right = tmp[0];
+  }
   if (!std::isdigit(right)) {
     throw 1;
   }
@@ -190,6 +198,9 @@ void AccountOperator::add_user() {
   }
   User user(userid, password, right, username);
   account.add_account(user);
+  if (right == '3') {
+    Log.add_admin(userid);
+  }
   return;
 }
 
@@ -225,6 +236,7 @@ void AccountOperator::modify_user() {
   if (!tokenscanner.has_more_tokens()) {
     throw 1;
   }
+  tokenscanner.set_word_limit(30);
   tokenscanner.set_char(userid);
   if (account.query_account(userid) == -1) {
     throw 1;
@@ -254,6 +266,7 @@ void AccountOperator::modify_user() {
 void AccountOperator::login() {
   char userid[31];
   char password[31];
+  tokenscanner.set_word_limit(30);
   tokenscanner.set_char(userid);
   if (account.query_account(userid) == -1) {
     throw 1;
