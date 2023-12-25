@@ -109,6 +109,9 @@ class AccountOperator {
   }
 
   std::string check_id() {
+    if (userlist.empty()) {
+      return "";
+    }
     return userlist.top().check_id();
   }
 
