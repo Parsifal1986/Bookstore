@@ -421,7 +421,7 @@ void BookOperator::update_book() {
       }
       tokenscanner.set_word_limit(13);
       std::string tmp = tokenscanner.next_token();
-      if (tokenscanner.check_double_legality(tmp)) {
+      if (!tokenscanner.check_double_legality(tmp)) {
         throw 1;
       }
       price = strtod(tmp.c_str(), &pend);
@@ -530,7 +530,7 @@ void BookOperator::import_book() {
   }
   tokenscanner.set_word_limit(13);
   std::string tmp = tokenscanner.next_token();
-  if (tokenscanner.check_double_legality(tmp)) {
+  if (!tokenscanner.check_double_legality(tmp)) {
     throw 1;
   }
   cost = std::strtod(tmp.c_str(), &pend);
