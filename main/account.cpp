@@ -284,6 +284,9 @@ void AccountOperator::modify_user() {
 void AccountOperator::login() {
   char userid[31];
   char password[31];
+  if (!tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
   tokenscanner.set_word_limit(30);
   tokenscanner.set_char(userid);
   if (account.query_account(userid) == -1) {
@@ -303,6 +306,9 @@ void AccountOperator::login() {
       }
     }
   }
+  if (tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
   // if (check_log_or_not.find(userid) != check_log_or_not.end()) {
   //   throw 1;
   // }
@@ -313,6 +319,9 @@ void AccountOperator::login() {
 }
 
 void AccountOperator::logout() {
+  if (tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
   if (userlist.empty()) {
     throw 1;
   } else {
