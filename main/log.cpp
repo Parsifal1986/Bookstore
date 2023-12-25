@@ -21,7 +21,7 @@ void LogManager::show_log() {
   for (int i = 0; i < log_number; ++i) {
     LogMessage tmp;
     log_database.read(tmp, i * sizeof(LogMessage));
-    std::cout << tmp.log << (tmp.type ? "   ...success!" : "   ...fail!") << std::endl;
+    std::cout << tmp;
   }
   return;
 }

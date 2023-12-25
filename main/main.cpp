@@ -2,6 +2,7 @@
 #include "book.hpp"
 #include "log.hpp"
 #include "tokenscanner.hpp"
+#include <cstring>
 #include <iostream>
 #include <cstdio>
 
@@ -14,6 +15,7 @@ int main() {
   std::string command;
   LogMessage piece_of_log;
   bool flag = false;
+  bool success_or_not = true;
 
   command.clear();
   while (!std::cin.eof()) {
@@ -91,23 +93,39 @@ int main() {
           throw 1;
         }
         break;
+      } else if (command == "log") {
+        if (!account_operator.check_right('7')) {
+          throw 1;
+        }
+        if (tokenscanner.has_more_tokens()) {
+          std::string admin = tokenscanner.next_token();
+          if (tokenscanner.has_more_tokens()) {
+            throw 1;
+          }
+          Log.show_log(admin);
+        } else {
+          Log.show_log();
+        }
       } else {
         throw 1;
       }
       tokenscanner.set_word_limit(-1);
-      piece_of_log.type = true;
     } catch (int){
       std::cout << "Invalid" << std::endl;
       tokenscanner.set_devide_by_slash(false);
       tokenscanner.set_whether_cut_up_equal_sign(false);
       tokenscanner.set_word_limit(-1);
-      piece_of_log.type = false;
+      success_or_not = false;
     }
-    // Log.add_log(piece_of_log);
-    // if (flag) {
-    //   Log.add_log(piece_of_log, account_operator.check_id());
-    //   flag = false;
-    // }
+    if (success_or_not) {
+      strcpy(piece_of_log.log, tokenscanner.ignore_white_space().c_str());
+      strcpy(piece_of_log.username, account_operator.check_id().c_str());
+      Log.add_log(piece_of_log);
+      if (flag) {
+        Log.add_log(piece_of_log, account_operator.check_id());
+        flag = false;
+      }
+    }
   }
   return 0;
 }

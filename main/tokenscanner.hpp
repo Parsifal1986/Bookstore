@@ -214,6 +214,25 @@ class Tokenscanner {
     return false;
   }
 
+  std::string ignore_white_space() {
+    std::string tmp;
+    bool flag = 0;
+    for (int i = 0; i < line.length(); ++i) {
+      if (line[i] == ' ') {
+        if (!flag) {
+          tmp += line[i];
+          flag = 1;
+        }
+      } else {
+        if (line[i] != ' ') {
+          tmp += line[i];
+          flag = 0;
+        }
+      }
+    }
+    return tmp;
+  };
+
  private:
   std::string line;
   int pos = 0, pre_pos = 0;

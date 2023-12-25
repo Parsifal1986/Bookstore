@@ -10,11 +10,11 @@
 #include <string>
 
 struct LogMessage {
-  char log[641] = {'\0'};
-  bool type = false;
+  char log[200] = {'\0'};
+  char username[31] = {'\0'};
 
   friend std::ostream & operator << (std::ostream & out, LogMessage &log) {
-    out << log.log << (log.type ? "   ...success!" : "   ...fail!") << std::endl;
+    out << log.username << log.log << std::endl;
     return out;
   };
 };
