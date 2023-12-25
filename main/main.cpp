@@ -16,7 +16,7 @@ int main() {
   bool flag = false;
 
   command.clear();
-  while (command != "quit" && command != "exit" && !std::cin.eof()) {
+  while (!std::cin.eof()) {
     try {
       std::string line;
       std::getline(std::cin, line);
@@ -87,6 +87,9 @@ int main() {
         }
         book_operator.buy_book();
       } else if (command == "quit" || command == "exit") {
+        if (tokenscanner.has_more_tokens()) {
+          throw 1;
+        }
         break;
       } else {
         throw 1;

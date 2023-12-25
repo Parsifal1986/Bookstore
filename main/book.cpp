@@ -371,6 +371,9 @@ void BookOperator::update_book() {
   char keyword[61] = {'\0'};
   int quantity = -1;
   double price = -1;
+  if (!tokenscanner.has_more_tokens()) {
+    throw 1;
+  }
   while (tokenscanner.has_more_tokens()) {
     tokenscanner.set_whether_cut_up_equal_sign(true);
     std::string token = tokenscanner.next_token();

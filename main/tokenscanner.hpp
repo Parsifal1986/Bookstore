@@ -28,6 +28,9 @@ class Tokenscanner {
     while (line[pos] == ' ')
       ++pos;
     int start = pos;
+    if (devide_by_slash && line[pos] == '|') {
+      throw 1;
+    }
     while (pos < line.length() && line[pos] != ' ') {
       ++pos;
       if (cut_up_equal_sign && line[pos] == '=') {
