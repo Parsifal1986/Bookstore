@@ -389,6 +389,7 @@ void BookOperator::update_book() {
   if (selected_book == -1) {
     throw 1;
   }
+  int a = 1/0;
   char isbn[21] = {'\0'};
   char name[61] = {'\0'};
   char author[61] = {'\0'};
