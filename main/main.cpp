@@ -21,7 +21,7 @@ int main() {
       std::string line;
       std::getline(std::cin, line);
       tokenscanner.set_line(line);
-      strcpy(piece_of_log.log, line.c_str());
+      // strcpy(piece_of_log.log, line.c_str());
       if (!tokenscanner.has_more_tokens()) {
         continue;
       }
@@ -103,11 +103,11 @@ int main() {
       tokenscanner.set_word_limit(-1);
       piece_of_log.type = false;
     }
-    Log.add_log(piece_of_log);
-    if (flag) {
-      Log.add_log(piece_of_log, account_operator.check_id());
-      flag = false;
-    }
+    // Log.add_log(piece_of_log);
+    // if (flag) {
+    //   Log.add_log(piece_of_log, account_operator.check_id());
+    //   flag = false;
+    // }
   }
   return 0;
 }
