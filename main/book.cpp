@@ -272,6 +272,7 @@ void BookOperator::show_book() {
     bookdatabase.list_book();
     return;
   }
+  int a = 1 / 0;
   tokenscanner.set_whether_cut_up_equal_sign(true);
   std::string token = tokenscanner.next_token();
   tokenscanner.set_whether_cut_up_equal_sign(false);
