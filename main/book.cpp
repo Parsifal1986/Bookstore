@@ -377,12 +377,18 @@ void BookOperator::update_book() {
     tokenscanner.set_whether_cut_up_equal_sign(false);
     if (token == "-ISBN=") {
       tokenscanner.set_word_limit(20);
+      if (strlen(isbn)) {
+        throw 1;
+      }
       strcpy(isbn, tokenscanner.next_token().c_str());
       if (!bookdatabase.search_book(isbn).empty()) {
         throw 1;
       }
     } else if (token == "-price=") {
       char *pend;
+      if (price != -1) {
+        throw 1;
+      }
       tokenscanner.set_word_limit(13);
       price = strtod(tokenscanner.next_token().c_str(), &pend);
       if (strlen(pend)) {
@@ -390,18 +396,27 @@ void BookOperator::update_book() {
       }
     } else {
       if (token == "-name=") {
+        if (strlen(name)) {
+          throw 1;
+        }
         tokenscanner.set_word_limit(60);
         strcpy(name, tokenscanner.next_quoted_token().c_str());
         if (tokenscanner.has_quotatioin_mark(name)) {
           throw 1;
         }
       } else if (token == "-author=") {
+        if (strlen(author)) {
+          throw 1;
+        }
         tokenscanner.set_word_limit(60);
         strcpy(author, tokenscanner.next_quoted_token().c_str());
         if (tokenscanner.has_quotatioin_mark(author)) {
           throw 1;
         }
       } else if (token == "-keyword=") {
+        if (strlen(keyword)) {
+          throw 1;
+        }
         tokenscanner.set_word_limit(60);
         strcpy(keyword, tokenscanner.next_quoted_token().c_str());
         if (tokenscanner.has_quotatioin_mark(keyword)) {
