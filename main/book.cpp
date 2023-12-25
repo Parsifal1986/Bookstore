@@ -287,12 +287,12 @@ void BookOperator::show_book() {
     if (!tokenscanner.is_printable(ISBN)) {
       throw 1;
     }
+    if (tokenscanner.has_more_tokens()) {
+      throw 1;
+    }
     if (index_list.empty()) {
       std::cout << std::endl;
       return;
-    }
-    if (tokenscanner.has_more_tokens()) {
-      throw 1;
     }
     bookdatabase.list_book(index_list);
   } else {
@@ -308,6 +308,9 @@ void BookOperator::show_book() {
       if (!tokenscanner.is_printable(name)) {
         throw 1;
       }
+      if (tokenscanner.has_more_tokens()) {
+        throw 1;
+      }
       if (index_list.empty()) {
         std::cout << std::endl;
         return;
@@ -317,6 +320,9 @@ void BookOperator::show_book() {
       strcpy(author, tokenscanner.next_quoted_token().c_str());
       index_list = authorindex.search_book(author);
       if (!tokenscanner.is_printable(author)) {
+        throw 1;
+      }
+      if (tokenscanner.has_more_tokens()) {
         throw 1;
       }
       if (index_list.empty()) {
@@ -330,6 +336,9 @@ void BookOperator::show_book() {
         throw 1;
       }
       index_list = keywordindex.search_book(keyword);
+      if (tokenscanner.has_more_tokens()) {
+        throw 1;
+      }
       if (!tokenscanner.is_printable(keyword)) {
         throw 1;
       }
