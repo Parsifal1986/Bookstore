@@ -240,6 +240,25 @@ class Tokenscanner {
     return tmp;
   };
 
+  bool check_double_legality(std::string str) {
+    int dot_number = 0;
+    for (int i = 0; i < str.length(); ++i) {
+      if (str[i] == '.') {
+        if (i == 0 || i == str.length() - 1) {
+          return false;
+        }
+        ++dot_number;
+      }
+      if (!std::isdigit(str[i]) && str[i] != '.') {
+        return false;
+      }
+    }
+    if (dot_number > 1) {
+      return false;
+    }
+    return true;
+  }
+
  private:
   std::string line;
   int pos = 0, pre_pos = 0;

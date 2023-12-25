@@ -420,7 +420,9 @@ void BookOperator::update_book() {
         throw 1;
       }
       tokenscanner.set_word_limit(13);
-      price = strtod(tokenscanner.next_token().c_str(), &pend);
+      std::string tmp = tokenscanner.next_token();
+      tokenscanner.check_double_legality(tmp);
+      price = strtod(tmp.c_str(), &pend);
       if (strlen(pend)) {
         throw 1;
       }
