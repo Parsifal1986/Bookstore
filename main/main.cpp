@@ -113,7 +113,7 @@ int main() {
           }
           Log.report_finance();
         } else if (type == "employee") {
-          if (tokenscanner.has_more_tokens()) {
+          if (!tokenscanner.has_more_tokens()) {
             throw 1;
           }
           std::string admin_name(tokenscanner.next_token());

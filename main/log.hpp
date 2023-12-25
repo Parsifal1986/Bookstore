@@ -74,10 +74,10 @@ template <class T> class linklist {
   void show_node(int index) {
     Node tmp;
     file.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
-    file.seekg(index * sizeofNode, std::ios::beg);
+    file.seekg(index, std::ios::beg);
     file.read(reinterpret_cast<char *>(&tmp), sizeofNode);
     while(tmp.next != -1) {
-      file.seekg(tmp.next * sizeofNode, std::ios::beg);
+      file.seekg(tmp.next, std::ios::beg);
       file.read(reinterpret_cast<char *>(&tmp), sizeofNode);
       std::cout << tmp.data << std::endl;
     }

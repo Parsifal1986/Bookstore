@@ -214,6 +214,13 @@ class Tokenscanner {
     return false;
   }
 
+  bool detect_white_space() {
+    if (line[pos] == ' ') {
+      return true;
+    }
+    return false;
+  }
+
   std::string ignore_white_space() {
     std::string tmp;
     bool flag = 0;

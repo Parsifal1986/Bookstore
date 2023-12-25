@@ -20,7 +20,7 @@ void LogManager::show_log() {
   }
   for (int i = 0; i < log_number; ++i) {
     LogMessage tmp;
-    log_database.read(tmp, i * sizeof(LogMessage));
+    log_database.read(tmp, i * sizeof(LogMessage) + sizeof(int));
     std::cout << tmp;
   }
   return;
