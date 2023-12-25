@@ -98,13 +98,28 @@ int main() {
           throw 1;
         }
         if (tokenscanner.has_more_tokens()) {
-          std::string admin = tokenscanner.next_token();
+          throw 1;
+        }
+        Log.show_log();
+      } else if (command == "report") {
+        std::string type;
+        if (!account_operator.check_right('7')) {
+          throw 1;
+        }
+        type = tokenscanner.next_token();
+        if (type == "finance") {
           if (tokenscanner.has_more_tokens()) {
             throw 1;
           }
-          Log.show_log(admin);
+          Log.report_finance();
+        } else if (type == "employee") {
+          if (tokenscanner.has_more_tokens()) {
+            throw 1;
+          }
+          std::string admin_name(tokenscanner.next_token());
+          Log.show_log(admin_name);
         } else {
-          Log.show_log();
+          throw 1;
         }
       } else {
         throw 1;

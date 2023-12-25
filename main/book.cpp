@@ -284,6 +284,9 @@ void BookOperator::show_book() {
     tokenscanner.set_word_limit(20);
     tokenscanner.set_char(ISBN);
     index_list = bookdatabase.search_book(ISBN);
+    if (!tokenscanner.is_printable(ISBN)) {
+      throw 1;
+    }
     if (index_list.empty()) {
       std::cout << std::endl;
       return;
@@ -302,6 +305,9 @@ void BookOperator::show_book() {
       char name[61];
       strcpy(name, tokenscanner.next_quoted_token().c_str());
       index_list = nameindex.search_book(name);
+      if (!tokenscanner.is_printable(name)) {
+        throw 1;
+      }
       if (index_list.empty()) {
         std::cout << std::endl;
         return;
@@ -310,6 +316,9 @@ void BookOperator::show_book() {
       char author[61];
       strcpy(author, tokenscanner.next_quoted_token().c_str());
       index_list = authorindex.search_book(author);
+      if (!tokenscanner.is_printable(author)) {
+        throw 1;
+      }
       if (index_list.empty()) {
         std::cout << std::endl;
         return;
@@ -321,6 +330,9 @@ void BookOperator::show_book() {
         throw 1;
       }
       index_list = keywordindex.search_book(keyword);
+      if (!tokenscanner.is_printable(keyword)) {
+        throw 1;
+      }
       if (index_list.empty()) {
         std::cout << std::endl;
         return;

@@ -190,7 +190,7 @@ class Tokenscanner {
   bool is_printable(std::string str) {
     for (int i = 0; i < str.length(); ++i) {
       if (!std::isprint(str[i])) {
-        return false;;
+        return false;
       }
     }
     return true;
