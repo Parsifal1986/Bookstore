@@ -56,15 +56,20 @@ class Tokenscanner {
   }
 
   int next_number() {
-    if (pos >= line.length())
-      return 0;
-    while (line[pos] == ' ')
+    if (pos >= line.length()) {
+      throw 1;
+    }
+    while (line[pos] == ' ') {
       ++pos;
+    }
     int start = pos;
     if (!std::isdigit(line[pos])) {
       throw 1;
     }
-    while (pos < line.length() && line[pos] != ' ' && isdigit(line[pos])) {
+    while (pos < line.length() && line[pos] != ' ') {
+      if (!std::isdigit(line[pos])) {
+        throw 1;
+      }
       ++pos;
       if (cut_up_equal_sign && line[pos] == '=') {
         ++pos;

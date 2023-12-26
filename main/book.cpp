@@ -3,6 +3,7 @@
 #include "tokenscanner.hpp"
 #include <algorithm>
 #include <bits/types/struct_tm.h>
+#include <cmath>
 #include <cstring>
 #include <iomanip>
 #include <string>
@@ -389,7 +390,6 @@ void BookOperator::update_book() {
   if (selected_book == -1) {
     throw 1;
   }
-  int a = 1/0;
   char isbn[21] = {'\0'};
   char name[61] = {'\0'};
   char author[61] = {'\0'};
@@ -429,6 +429,7 @@ void BookOperator::update_book() {
       if (strlen(pend)) {
         throw 1;
       }
+      price = std::floor(price * 100 + 0.5) / 100.0;
     } else {
       if (token == "-name=") {
         if (strlen(name)) {
@@ -538,6 +539,7 @@ void BookOperator::import_book() {
   if (strlen(pend)) {
     throw 1;
   }
+  cost = std::floor(cost * 100 + 0.5) / 100.0;
   if (cost <= 0) {
     throw 1;
   }
