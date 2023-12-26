@@ -527,6 +527,9 @@ void BookOperator::import_book() {
   } catch (int) {
     throw 1;
   }
+  if (quantity <= 0) {
+    throw 1;
+  }
   if (!tokenscanner.has_more_tokens()) {
     throw 1;
   }
