@@ -21,7 +21,7 @@ void LogManager::show_log() {
   for (int i = 0; i < log_number; ++i) {
     LogMessage tmp;
     log_database.read(tmp, i * sizeof(LogMessage) + sizeof(int));
-    std::cout << tmp;
+    std::cout << tmp << std::endl;
   }
   return;
 }
@@ -99,9 +99,9 @@ void LogManager::report_finance() {
   finance.read(tmp2, sizeof(int));
   std::cout << "+ " << setiosflags(std::ios::fixed) << std::setprecision(2) << tmp2.first
             << " - " << setiosflags(std::ios::fixed) << std::setprecision(2) << tmp2.second << std::endl;
-  for (int i = 1; i <= finance_number; ++i) {
-    finance.read(tmp2, i * sizeof(std::pair<double, double>) + sizeof(int));
+  for (int i = 1; i < finance_number; ++i) {
     tmp1 = tmp2;
+    finance.read(tmp2, i * sizeof(std::pair<double, double>) + sizeof(int));
     std::cout << "+ " << setiosflags(std::ios::fixed) << std::setprecision(2) << tmp2.first - tmp1.first
               << " - " << setiosflags(std::ios::fixed) << std::setprecision(2) << tmp2.second - tmp1.second << std::endl;
   }

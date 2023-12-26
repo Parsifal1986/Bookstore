@@ -14,7 +14,7 @@ struct LogMessage {
   char username[31] = {'\0'};
 
   friend std::ostream & operator << (std::ostream & out, LogMessage &log) {
-    out << log.username << " : " << log.log << std::endl;
+    out << log.username << " : " << log.log;
     return out;
   };
 };
