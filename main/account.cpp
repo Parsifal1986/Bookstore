@@ -191,6 +191,9 @@ void AccountOperator::add_user() {
   if (tokenscanner.has_more_tokens()) {
     throw 1;
   }
+  if (!tokenscanner.is_printable(username)) {
+    throw 1;
+  }
   if (!check_right(right + 1) || (right != '1' && right != '3')) {
     throw 1;
   }
@@ -212,6 +215,9 @@ void AccountOperator::delete_user() {
   }
   tokenscanner.set_word_limit(30);
   tokenscanner.set_char(userid);
+  if (!tokenscanner.is_legal(userid)) {
+    throw 1;
+  }
   if (tokenscanner.has_more_tokens()) {
     throw 1;
   }
@@ -240,6 +246,9 @@ void AccountOperator::modify_user() {
   }
   tokenscanner.set_word_limit(30);
   tokenscanner.set_char(userid);
+  if (!tokenscanner.is_legal(userid)) {
+    throw 1;
+  }
   if (account.query_account(userid) == -1) {
     throw 1;
   }
@@ -248,6 +257,9 @@ void AccountOperator::modify_user() {
     throw 1;
   }
   tokenscanner.set_char(current_password);
+  if (!tokenscanner.is_legal(current_password)) {
+    throw 1;
+  }
   if (!check_right('7')) {
     if (!modified_user.check_password(current_password)) {
       throw 1;
@@ -256,6 +268,9 @@ void AccountOperator::modify_user() {
       throw 1;
     }
     tokenscanner.set_char(new_password);
+    if (!tokenscanner.is_legal(new_password)) {
+      throw 1;
+    }
     if (tokenscanner.has_more_tokens()) {
       throw 1;
     }
@@ -264,6 +279,9 @@ void AccountOperator::modify_user() {
   } else {
     if (tokenscanner.has_more_tokens()) {
       tokenscanner.set_char(new_password);
+      if (!tokenscanner.is_legal(new_password)) {
+        throw 1;
+      }
       if (tokenscanner.has_more_tokens()) {
         throw 1;
       }
