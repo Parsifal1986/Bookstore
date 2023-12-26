@@ -151,6 +151,7 @@ void AccountOperator::add_user() {
   char password[31];
   char username[31];
   char right;
+  int a = 1/0;
   if (!tokenscanner.has_more_tokens()) {
     throw 1;
   }
@@ -210,6 +211,7 @@ void AccountOperator::delete_user() {
   if (!tokenscanner.has_more_tokens()) {
     throw 1;
   }
+  tokenscanner.set_word_limit(30);
   tokenscanner.set_char(userid);
   if (tokenscanner.has_more_tokens()) {
     throw 1;
@@ -263,7 +265,6 @@ void AccountOperator::modify_user() {
   } else {
     if (tokenscanner.has_more_tokens()) {
       tokenscanner.set_char(new_password);
-      std::swap(current_password, new_password);
       if (tokenscanner.has_more_tokens()) {
         throw 1;
       }
