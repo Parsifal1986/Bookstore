@@ -312,6 +312,9 @@ void BookOperator::show_book() {
       if (!tokenscanner.is_printable(name)) {
         throw 1;
       }
+      if (tokenscanner.has_quotatioin_mark(name)) {
+        throw 1;
+      }
       if (tokenscanner.has_more_tokens()) {
         throw 1;
       }
@@ -324,6 +327,9 @@ void BookOperator::show_book() {
       strcpy(author, tokenscanner.next_quoted_token().c_str());
       index_list = authorindex.search_book(author);
       if (!tokenscanner.is_printable(author)) {
+        throw 1;
+      }
+      if (tokenscanner.has_quotatioin_mark(author)) {
         throw 1;
       }
       if (tokenscanner.has_more_tokens()) {
@@ -340,6 +346,9 @@ void BookOperator::show_book() {
         throw 1;
       }
       index_list = keywordindex.search_book(keyword);
+      if (tokenscanner.has_quotatioin_mark(keyword)) {
+        throw 1;
+      }
       if (tokenscanner.has_more_tokens()) {
         throw 1;
       }
@@ -406,12 +415,18 @@ void BookOperator::update_book() {
     if (tokenscanner.detect_white_space()) {
       throw 1;
     }
+    if (!tokenscanner.has_more_tokens()) {
+      throw 1;
+    }
     if (token == "-ISBN=") {
       tokenscanner.set_word_limit(20);
       if (strlen(isbn)) {
         throw 1;
       }
       strcpy(isbn, tokenscanner.next_token().c_str());
+      if (!tokenscanner.is_printable(isbn)) {
+        throw 1;
+      }
       if (!bookdatabase.search_book(isbn).empty()) {
         throw 1;
       }
@@ -437,6 +452,9 @@ void BookOperator::update_book() {
         }
         tokenscanner.set_word_limit(60);
         strcpy(name, tokenscanner.next_quoted_token().c_str());
+        if (!tokenscanner.is_printable(name)) {
+          throw 1;
+        }
         if (tokenscanner.has_quotatioin_mark(name)) {
           throw 1;
         }
@@ -446,6 +464,9 @@ void BookOperator::update_book() {
         }
         tokenscanner.set_word_limit(60);
         strcpy(author, tokenscanner.next_quoted_token().c_str());
+        if (!tokenscanner.is_printable(author)) {
+          throw 1;
+        }
         if (tokenscanner.has_quotatioin_mark(author)) {
           throw 1;
         }
@@ -455,6 +476,9 @@ void BookOperator::update_book() {
         }
         tokenscanner.set_word_limit(60);
         strcpy(keyword, tokenscanner.next_quoted_token().c_str());
+        if (!tokenscanner.is_printable(keyword)) {
+          throw 1;
+        }
         if (tokenscanner.has_quotatioin_mark(keyword)) {
           throw 1;
         }

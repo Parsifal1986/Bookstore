@@ -151,7 +151,6 @@ void AccountOperator::add_user() {
   char password[31];
   char username[31];
   char right;
-  int a = 1/0;
   if (!tokenscanner.has_more_tokens()) {
     throw 1;
   }
